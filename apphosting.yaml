@@ -1,0 +1,44 @@
+# Firebase App Hosting configuration
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  cpu: 1
+  memoryMiB: 512
+  concurrency: 80
+  maxInstances: 4
+  minInstances: 0
+
+env:
+  # Supabase — add when Compass build begins
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SUPABASE_SERVICE_ROLE_KEY
+    secret: supabase_service_role_key
+    availability:
+      - RUNTIME
+
+  # Stripe — add when Compass build begins
+  - variable: STRIPE_SECRET_KEY
+    secret: stripe_secret_key
+    availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: stripe_webhook_secret
+    availability:
+      - RUNTIME
+
+  # Claude API — add when Compass build begins
+  - variable: ANTHROPIC_API_KEY
+    secret: anthropic_api_key
+    availability:
+      - RUNTIME
