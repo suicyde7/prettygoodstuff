@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Image from 'next/image'
 
 const navLinks = [
@@ -11,14 +12,24 @@ const navLinks = [
 // Split to prevent scraper harvest
 const e = ['welcome', 'prettygoodstuff.co']
 const w = ['+1', '310', '710', '1208']
+const wc = ['cn', 'xo', 'xo', 'usa']
 
 export default function Footer() {
+  const [copied, setCopied] = useState(false)
+
   function openEmail() {
     window.location.href = 'mailto:' + e[0] + '@' + e[1]
   }
 
   function openWhatsApp() {
     window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
+  }
+
+  function copyWeChat() {
+    navigator.clipboard.writeText(wc.join('')).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
   }
 
   return (
@@ -63,6 +74,12 @@ export default function Footer() {
               className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide text-left"
             >
               WhatsApp
+            </button>
+            <button
+              onClick={copyWeChat}
+              className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide text-left"
+            >
+              {copied ? 'WeChat ID Copied ✓' : 'WeChat'}
             </button>
           </div>
         </div>

@@ -1,13 +1,23 @@
 'use client'
+import { useState } from 'react'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const w = ['+1', '310', '710', '1208']
+const wc = ['cn', 'xo', 'xo', 'usa']
 
 export default function CTAStrip() {
   const { ref, isVisible } = useScrollReveal()
+  const [copied, setCopied] = useState(false)
 
   function openWhatsApp() {
     window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
+  }
+
+  function copyWeChat() {
+    navigator.clipboard.writeText(wc.join('')).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
   }
 
   return (
@@ -35,7 +45,7 @@ export default function CTAStrip() {
               Book a free 30-minute strategy call. No pitch, no commitment —
               just clarity on your fastest path to market.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
               <a href="https://calendly.com/welcome-prettygoodstuff/30min" target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full">
                 Schedule Your Call
@@ -45,6 +55,11 @@ export default function CTAStrip() {
                 onClick={openWhatsApp}
                 className="flex items-center gap-3 border border-border text-muted font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:border-accent/30 hover:text-ink transition-all duration-200 rounded-full">
                 WhatsApp
+              </button>
+              <button
+                onClick={copyWeChat}
+                className="flex items-center gap-3 border border-border text-muted font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:border-accent/30 hover:text-ink transition-all duration-200 rounded-full">
+                {copied ? 'Copied ✓' : 'WeChat'}
               </button>
             </div>
           </div>
