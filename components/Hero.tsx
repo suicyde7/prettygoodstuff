@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none" />
 
-      <div className="relative z-10 px-8 max-w-7xl mx-auto w-full pt-24 md:pt-44 pb-16 md:pb-28">
+      <div className="relative z-10 px-8 max-w-7xl mx-auto w-full pt-16 md:pt-44 pb-16 md:pb-28">
         <div className={`transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
           {/* Badge */}

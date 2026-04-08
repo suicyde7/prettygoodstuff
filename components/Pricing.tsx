@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const plans = [
@@ -144,15 +144,6 @@ const styles: Record<string, {
 export default function Pricing() {
   const { ref, isVisible } = useScrollReveal()
   const [flipped, setFlipped] = useState([false, false, false])
-  const [cardHeight, setCardHeight] = useState(720)
-
-  useEffect(() => {
-    const update = () => setCardHeight(window.innerWidth < 768 ? 880 : 720)
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
-
   const toggle = (i: number) => setFlipped(prev => prev.map((v, idx) => idx === i ? !v : v))
 
   return (
@@ -191,7 +182,7 @@ export default function Pricing() {
               <div
                 key={service}
                 className="relative cursor-pointer group"
-                style={{ perspective: '1200px', height: `${cardHeight + 60}px` }}
+                style={{ perspective: '1200px', height: '780px' }}
                 onClick={() => toggle(i)}
               >
                 {/* Flip container */}
@@ -200,7 +191,7 @@ export default function Pricing() {
                   style={{
                     transformStyle: 'preserve-3d',
                     transform: flipped[i] ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                    height: `${cardHeight}px`,
+                    height: '720px',
                   }}
                 >
 
@@ -263,7 +254,7 @@ export default function Pricing() {
                     </h3>
 
                     {/* Steps */}
-                    <div className="flex-grow flex flex-col justify-between">
+                    <div className="flex flex-col gap-3 overflow-y-auto">
                       {steps.map((step, si) => (
                         <div key={si} className="flex flex-col items-center">
                           <div className="flex items-start gap-4 w-full">
