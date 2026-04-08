@@ -1,4 +1,6 @@
+'use client'
 import Image from 'next/image'
+
 const navLinks = [
   { num: '01', label: 'Services', href: '#services' },
   { num: '02', label: 'Platform', href: '#platform' },
@@ -6,7 +8,19 @@ const navLinks = [
   { num: '04', label: 'Contact', href: '#contact' },
 ]
 
+// Split to prevent scraper harvest
+const e = ['welcome', 'prettygoodstuff.co']
+const w = ['+1', '310', '710', '1208']
+
 export default function Footer() {
+  function openEmail() {
+    window.location.href = 'mailto:' + e[0] + '@' + e[1]
+  }
+
+  function openWhatsApp() {
+    window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <footer className="bg-surface border-t border-border px-8 py-14">
       <div className="max-w-7xl mx-auto">
@@ -38,12 +52,18 @@ export default function Footer() {
 
           <div className="flex flex-col gap-3">
             <p className="text-muted/40 text-[10px] tracking-widest uppercase mb-2">Contact</p>
-            <a href="mailto:welcome@prettygoodstuff.co" className="text-muted text-sm hover:text-ink transition-colors duration-200">
-              welcome@prettygoodstuff.co
-            </a>
-            <a href="https://wa.me/13107101208" className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide">
+            <button
+              onClick={openEmail}
+              className="text-muted text-sm hover:text-ink transition-colors duration-200 text-left"
+            >
+              Get in Touch →
+            </button>
+            <button
+              onClick={openWhatsApp}
+              className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide text-left"
+            >
               WhatsApp
-            </a>
+            </button>
           </div>
         </div>
 

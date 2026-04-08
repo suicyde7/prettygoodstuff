@@ -1,8 +1,14 @@
 'use client'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
+const w = ['+1', '310', '710', '1208']
+
 export default function CTAStrip() {
   const { ref, isVisible } = useScrollReveal()
+
+  function openWhatsApp() {
+    window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <section id="contact" className="relative bg-surfaceAlt py-32 px-8 overflow-hidden border-t border-border">
@@ -35,11 +41,11 @@ export default function CTAStrip() {
                 Schedule Your Call
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </a>
-              {/* ── Replace with your real WhatsApp link ── */}
-              <a href="https://wa.me/13107101208" target="_blank" rel="noopener noreferrer"
+              <button
+                onClick={openWhatsApp}
                 className="flex items-center gap-3 border border-border text-muted font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:border-accent/30 hover:text-ink transition-all duration-200 rounded-full">
                 WhatsApp
-              </a>
+              </button>
             </div>
           </div>
         </div>
