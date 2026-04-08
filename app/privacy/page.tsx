@@ -50,7 +50,8 @@ export default function PrivacyPage() {
             <section>
               <h2 className="font-display font-semibold text-xl text-ink uppercase mb-4">1. Who We Are</h2>
               <p>
-                Pretty Good Stuff (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates the website{' '}
+                Pretty Good Stuff is a DBA of [Your LLC Name], a Nevada LLC (&quot;we&quot;, &quot;us&quot;,
+                &quot;our&quot;). We operate the website{' '}
                 <span className="text-ink">prettygoodstuff.co</span> and provides Amazon store management,
                 China FBA prep, and related consulting services. This Privacy Policy explains how we collect,
                 use, and protect personal information you provide to us.

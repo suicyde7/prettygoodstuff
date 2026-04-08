@@ -50,9 +50,11 @@ export default function TermsPage() {
             <section>
               <h2 className="font-display font-semibold text-xl text-ink uppercase mb-4">1. Agreement</h2>
               <p>
-                By accessing or using the website at <span className="text-ink">prettygoodstuff.co</span> or
-                engaging Pretty Good Stuff for consulting services, you agree to be bound by these Terms of
-                Service. If you do not agree, please do not use our website or services.
+                Pretty Good Stuff is a DBA (doing business as) of [Your LLC Name], a Nevada limited
+                liability company (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By accessing or using
+                the website at <span className="text-ink">prettygoodstuff.co</span> or engaging us for
+                consulting services, you agree to be bound by these Terms of Service. If you do not agree,
+                please do not use our website or services.
               </p>
             </section>
 
@@ -138,10 +140,9 @@ export default function TermsPage() {
             <section>
               <h2 className="font-display font-semibold text-xl text-ink uppercase mb-4">9. Governing Law</h2>
               <p>
-                {/* PLACEHOLDER — update with your jurisdiction */}
-                These Terms are governed by the laws of [Your State/Country]. Any disputes shall be
-                resolved through good-faith negotiation first, followed by binding arbitration if
-                unresolved within 30 days.
+                  These Terms are governed by the laws of the State of Nevada, United States. Any disputes
+                shall be resolved through good-faith negotiation first, followed by binding arbitration
+                if unresolved within 30 days.
               </p>
             </section>
 
