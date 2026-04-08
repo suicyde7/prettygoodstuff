@@ -41,7 +41,7 @@ export default function Footer() {
             <a href="mailto:welcome@prettygoodstuff.co" className="text-muted text-sm hover:text-ink transition-colors duration-200">
               welcome@prettygoodstuff.co
             </a>
-            <a href="https://wa.me/1234567890" className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide">
+            <a href="https://wa.me/13107101208" className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide">
               WhatsApp
             </a>
           </div>
