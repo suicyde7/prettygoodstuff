@@ -30,8 +30,7 @@ export default function CTAStrip() {
               just clarity on your fastest path to market.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              {/* ── Replace with your real email or cal.com booking link ── */}
-              <a href="mailto:your@email.com"
+              <a href="https://calendly.com/welcome-prettygoodstuff/30min"
                 className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full">
                 Schedule Your Call
                 <span className="group-hover:translate-x-1 transition-transform">→</span>

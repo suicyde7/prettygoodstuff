@@ -38,9 +38,8 @@ export default function Footer() {
 
           <div className="flex flex-col gap-3">
             <p className="text-muted/40 text-[10px] tracking-widest uppercase mb-2">Contact</p>
-            {/* ── Update with real details ── */}
-            <a href="mailto:your@email.com" className="text-muted text-sm hover:text-ink transition-colors duration-200">
-              your@email.com
+            <a href="mailto:welcome@prettygoodstuff.co" className="text-muted text-sm hover:text-ink transition-colors duration-200">
+              welcome@prettygoodstuff.co
             </a>
             <a href="https://wa.me/1234567890" className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide">
               WhatsApp
