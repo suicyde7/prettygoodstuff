@@ -254,29 +254,20 @@ export default function Pricing() {
                     </h3>
 
                     {/* Steps */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col flex-grow justify-between py-2">
                       {steps.map((step, si) => (
-                        <div key={si} className="flex flex-col items-center">
-                          <div className="flex items-start gap-3 w-full">
-                            <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border ${s.circle}`}>
-                              {step.num}
-                            </div>
-                            <div className="flex-1">
-                              <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${s.stepTitle}`}>
-                                {step.title}
-                              </p>
-                              <p className={`text-xs leading-snug ${s.stepDesc}`}>
-                                {step.desc}
-                              </p>
-                            </div>
+                        <div key={si} className="flex items-start gap-3 w-full">
+                          <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border ${s.circle}`}>
+                            {step.num}
                           </div>
-                          {si < steps.length - 1 && (
-                            <div className="self-start mt-0.5 mb-0.5 flex flex-col items-center" style={{ marginLeft: '13px' }}>
-                              <div className={`w-px h-2 ${s.connector}`} />
-                              <span className={`text-[9px] ${s.arrow}`}>↓</span>
-                              <div className={`w-px h-2 ${s.connector}`} />
-                            </div>
-                          )}
+                          <div className="flex-1">
+                            <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${s.stepTitle}`}>
+                              {step.title}
+                            </p>
+                            <p className={`text-xs leading-snug ${s.stepDesc}`}>
+                              {step.desc}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -290,7 +281,7 @@ export default function Pricing() {
         </div>
 
         {/* Single CTA */}
-        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+        <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <p className="text-muted text-sm max-w-sm leading-relaxed">
             Not sure which service fits? Book a free 30-minute call — we'll tell you exactly what your account needs.
           </p>
