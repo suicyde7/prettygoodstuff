@@ -249,32 +249,32 @@ export default function Pricing() {
                       <span className={`text-[10px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full border ${s.tag}`}>How It Works</span>
                     </div>
 
-                    <h3 className="font-display font-semibold text-xl uppercase mb-6 leading-tight text-ink">
+                    <h3 className="font-display font-semibold text-xl uppercase mb-3 leading-tight text-ink">
                       {service}
                     </h3>
 
                     {/* Steps */}
-                    <div className="flex flex-col gap-3 overflow-y-auto">
+                    <div className="flex flex-col">
                       {steps.map((step, si) => (
                         <div key={si} className="flex flex-col items-center">
-                          <div className="flex items-start gap-4 w-full">
-                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border ${s.circle}`}>
+                          <div className="flex items-start gap-3 w-full">
+                            <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border ${s.circle}`}>
                               {step.num}
                             </div>
-                            <div className="flex-1 pb-1">
-                              <p className={`text-sm font-bold uppercase tracking-wide mb-0.5 ${s.stepTitle}`}>
+                            <div className="flex-1">
+                              <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${s.stepTitle}`}>
                                 {step.title}
                               </p>
-                              <p className={`text-sm leading-relaxed ${s.stepDesc}`}>
+                              <p className={`text-xs leading-snug ${s.stepDesc}`}>
                                 {step.desc}
                               </p>
                             </div>
                           </div>
                           {si < steps.length - 1 && (
-                            <div className="self-start mt-1.5 mb-1.5 flex flex-col items-center" style={{ marginLeft: '15px' }}>
-                              <div className={`w-px h-3 ${s.connector}`} />
-                              <span className={`text-[10px] ${s.arrow}`}>↓</span>
-                              <div className={`w-px h-3 ${s.connector}`} />
+                            <div className="self-start mt-0.5 mb-0.5 flex flex-col items-center" style={{ marginLeft: '13px' }}>
+                              <div className={`w-px h-2 ${s.connector}`} />
+                              <span className={`text-[9px] ${s.arrow}`}>↓</span>
+                              <div className={`w-px h-2 ${s.connector}`} />
                             </div>
                           )}
                         </div>
