@@ -25,11 +25,16 @@ export default function Footer() {
     window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
   }
 
-  function copyWeChat() {
-    navigator.clipboard.writeText(wc.join('')).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+  function handleWeChat() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (isMobile) {
+      window.location.href = 'weixin://dl/chat?' + wc.join('')
+    } else {
+      navigator.clipboard.writeText(wc.join('')).then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+    }
   }
 
   return (
@@ -76,7 +81,7 @@ export default function Footer() {
               WhatsApp
             </button>
             <button
-              onClick={copyWeChat}
+              onClick={handleWeChat}
               className="text-muted/50 text-xs hover:text-muted transition-colors duration-200 tracking-wide text-left"
             >
               {copied ? 'WeChat ID Copied ✓' : 'WeChat'}

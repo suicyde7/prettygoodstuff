@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const plans = [
@@ -144,6 +144,14 @@ const styles: Record<string, {
 export default function Pricing() {
   const { ref, isVisible } = useScrollReveal()
   const [flipped, setFlipped] = useState([false, false, false])
+  const [cardHeight, setCardHeight] = useState(720)
+
+  useEffect(() => {
+    const update = () => setCardHeight(window.innerWidth < 768 ? 880 : 720)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   const toggle = (i: number) => setFlipped(prev => prev.map((v, idx) => idx === i ? !v : v))
 
@@ -183,7 +191,7 @@ export default function Pricing() {
               <div
                 key={service}
                 className="relative cursor-pointer group"
-                style={{ perspective: '1200px' }}
+                style={{ perspective: '1200px', height: `${cardHeight + 60}px` }}
                 onClick={() => toggle(i)}
               >
                 {/* Flip container */}
@@ -192,7 +200,7 @@ export default function Pricing() {
                   style={{
                     transformStyle: 'preserve-3d',
                     transform: flipped[i] ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                    height: '720px',
+                    height: `${cardHeight}px`,
                   }}
                 >
 

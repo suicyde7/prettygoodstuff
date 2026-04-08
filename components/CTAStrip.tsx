@@ -13,11 +13,16 @@ export default function CTAStrip() {
     window.open('https://wa.me/' + w.join('').replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
   }
 
-  function copyWeChat() {
-    navigator.clipboard.writeText(wc.join('')).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+  function handleWeChat() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (isMobile) {
+      window.location.href = 'weixin://dl/chat?' + wc.join('')
+    } else {
+      navigator.clipboard.writeText(wc.join('')).then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+    }
   }
 
   return (
@@ -57,7 +62,7 @@ export default function CTAStrip() {
                 WhatsApp
               </button>
               <button
-                onClick={copyWeChat}
+                onClick={handleWeChat}
                 className="flex items-center gap-3 border border-border text-muted font-semibold text-xs tracking-widest uppercase px-10 py-5 hover:border-accent/30 hover:text-ink transition-all duration-200 rounded-full">
                 {copied ? 'Copied ✓' : 'WeChat'}
               </button>
