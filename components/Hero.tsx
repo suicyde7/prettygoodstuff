@@ -36,7 +36,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#contact"
                 className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-8 py-4 hover:bg-accentDark transition-all duration-200 rounded-full">
-                Claim Your Spot
+                Book a Free Strategy Call
                 <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
               </a>
               <a href="#services"
