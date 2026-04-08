@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prettygoodstuff.co/sitemap.xml

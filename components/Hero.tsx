@@ -17,7 +17,7 @@ export default function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-surface border border-accent/20 text-accent px-4 py-2 rounded-full mb-10 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-semibold tracking-widest uppercase">Now Accepting Founding Clients — Limited Spots</span>
+            <span className="text-xs font-semibold tracking-widest uppercase">Now Accepting Founding Clients - Limited Spots</span>
           </div>
 
           {/* Headline */}
@@ -34,7 +34,7 @@ export default function Hero() {
               FBA prep, and a guided seller platform coming soon.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <a href="/waitlist"
+              <a href="#contact"
                 className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-8 py-4 hover:bg-accentDark transition-all duration-200 rounded-full">
                 Claim Your Spot
                 <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>

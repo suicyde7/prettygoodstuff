@@ -91,7 +91,10 @@ export default function Footer() {
 
         <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted/40 text-xs">© 2026 Pretty Good Stuff. All rights reserved.</p>
-          <p className="text-muted/25 text-xs tracking-widest uppercase">Amazon · Sourcing · Prep · Platform</p>
+          <div className="flex items-center gap-6">
+            <a href="/privacy" className="text-muted/40 text-xs hover:text-muted transition-colors duration-200">Privacy Policy</a>
+            <a href="/terms" className="text-muted/40 text-xs hover:text-muted transition-colors duration-200">Terms of Service</a>
+          </div>
         </div>
       </div>
     </footer>
