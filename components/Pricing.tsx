@@ -177,13 +177,13 @@ export default function Pricing() {
 
         <div ref={ref}
           className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          {plans.map(({ num, tag, service, forIf, price, originalPrice, discount, unit, features, cta, accent, steps }, i) => {
+          {plans.map(({ num, tag, service, forIf, price, originalPrice, discount, unit, features, accent, steps }, i) => {
             const s = styles[accent]
             return (
               <div
                 key={service}
                 className="relative cursor-pointer group"
-                style={{ perspective: '1200px', height: '780px' }}
+                style={{ perspective: '1200px' }}
                 onClick={() => toggle(i)}
               >
                 {/* Flip container */}
@@ -285,19 +285,26 @@ export default function Pricing() {
 
                 </div>
 
-                {/* ── CTA BUTTON — centered exactly on card face bottom edge ── */}
-                <a
-                  href="#contact"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ top: '720px', transform: 'translateY(-50%)' }}
-                  className={`absolute left-6 right-6 text-center text-xs font-semibold tracking-widest uppercase py-4 rounded-full transition-all duration-300 shadow-lg ${flipped[i] ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                    } ${s.button}`}
-                >
-                  {cta}
-                </a>
               </div>
             )
           })}
+        </div>
+
+        {/* Single CTA */}
+        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+          <p className="text-muted text-sm max-w-sm leading-relaxed">
+            Not sure which service fits? Book a free 30-minute call — we'll tell you exactly what your account needs.
+          </p>
+          <a
+            href="https://calendly.com/welcome-prettygoodstuff/30min"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-12 py-5 rounded-full hover:bg-accentDark transition-all duration-200 shadow-lg shadow-accent/20"
+          >
+            Book a Free Strategy Call
+            <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+          </a>
+          <p className="text-muted/40 text-xs">No commitment. No pitch. Just clarity.</p>
         </div>
 
       </div>

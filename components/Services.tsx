@@ -132,7 +132,7 @@ export default function Services() {
               <div
                 key={name}
                 className="relative cursor-pointer group"
-                style={{ perspective: '1200px', height: '780px' }}
+                style={{ perspective: '1200px' }}
                 onClick={() => toggle(i)}
               >
                 {/* Flip container */}
@@ -208,16 +208,6 @@ export default function Services() {
 
                 </div>
 
-                {/* Button — centered on bottom border */}
-                <a
-                  href="#contact"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ top: '720px', transform: 'translateY(-50%)' }}
-                  className={`absolute left-6 right-6 text-center text-xs font-semibold tracking-widest uppercase py-4 rounded-full shadow-lg transition-all duration-300 ${flipped[i] ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                    } ${s.button}`}
-                >
-                  Book a Free Consultation
-                </a>
               </div>
             )
           })}
