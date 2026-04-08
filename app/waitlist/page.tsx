@@ -64,25 +64,20 @@ export default function WaitlistPage() {
     setFormState('submitting')
 
     try {
-      // ── Replace YOUR_FORM_ID with your Formspree endpoint ID ──
-      // Get a free endpoint at https://formspree.io
-      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      await fetch('https://script.google.com/macros/s/AKfycbypSjBsqwj-biJTh5g0AkiuDeYE2ux2ko5jWXX5Sh7UZPhUmd5ai802Mk52uRp97EFl/exec', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
-          name: form.name || '—',
-          phone: form.phone || '—',
-          company: form.company || '—',
-          amazon_store_url: form.storeUrl || '—',
-          interested_in: selected.join(', '),
+          name: form.name || '',
+          phone: form.phone || '',
+          company: form.company || '',
+          storeUrl: form.storeUrl || '',
+          interests: selected.join(', '),
         }),
       })
-      if (res.ok) {
-        setFormState('success')
-      } else {
-        setFormState('error')
-      }
+      setFormState('success')
     } catch {
       setFormState('error')
     }
