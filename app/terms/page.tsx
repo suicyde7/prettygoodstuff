@@ -50,7 +50,7 @@ export default function TermsPage() {
             <section>
               <h2 className="font-display font-semibold text-xl text-ink uppercase mb-4">1. Agreement</h2>
               <p>
-                Pretty Good Stuff is a DBA (doing business as) of [Your LLC Name], a Nevada limited
+                Pretty Good Stuff is a DBA (doing business as) of ShenCo LLC, a Nevada limited
                 liability company (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By accessing or using
                 the website at <span className="text-ink">prettygoodstuff.co</span> or engaging us for
                 consulting services, you agree to be bound by these Terms of Service. If you do not agree,

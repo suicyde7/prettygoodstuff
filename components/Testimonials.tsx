@@ -6,8 +6,7 @@ const testimonials = [
     quote:
       'Working with PGS completely transformed our Amazon presence. Our ACOS dropped from 45% to 18% within 60 days — and our organic rank climbed across every main keyword. The level of attention we got as a founding client was exceptional.',
     name: '[Client Name]',
-    role: '[Founder]',
-    company: '[Brand Name]',
+    category: '[Product Category]',
     result: 'ACOS: 45% → 18%',
     accent: 'orange',
   },
@@ -15,8 +14,7 @@ const testimonials = [
     quote:
       'The China FBA prep service eliminated the quality issues we\'d been battling for two years. Every batch arrives at Amazon\'s warehouse clean, labeled, and compliant. We haven\'t had a single FBA rejection since switching.',
     name: '[Client Name]',
-    role: '[Operations Manager]',
-    company: '[Brand Name]',
+    category: '[Product Category]',
     result: 'Zero FBA rejections',
     accent: 'amber',
   },
@@ -24,8 +22,7 @@ const testimonials = [
     quote:
       'From zero to a fully live, advertising Amazon store in under 90 days. PGS handled everything — account setup, Brand Registry, A+ Content, PPC launch. We didn\'t have to learn Amazon. We just had to run our business.',
     name: '[Client Name]',
-    role: '[CEO]',
-    company: '[Brand Name]',
+    category: '[Product Category]',
     result: 'Live store in 90 days',
     accent: 'warm',
   },
@@ -76,7 +73,7 @@ export default function Testimonials() {
           ref={ref}
           className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
-          {testimonials.map(({ quote, name, role, company, result, accent }) => {
+          {testimonials.map(({ quote, name, category, result, accent }) => {
             const s = styles[accent]
             return (
               <div
@@ -99,7 +96,7 @@ export default function Testimonials() {
                 {/* Attribution */}
                 <div className="border-t border-border pt-5">
                   <p className="text-ink text-sm font-semibold">{name}</p>
-                  <p className="text-muted text-xs mt-0.5">{role} · {company}</p>
+                  <p className="text-muted text-xs mt-0.5">{category}</p>
                 </div>
               </div>
             )
