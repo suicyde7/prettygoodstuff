@@ -5,24 +5,24 @@ const testimonials = [
   {
     quote:
       'Working with PGS completely transformed our Amazon presence. Our ACOS dropped from 45% to 18% within 60 days — and our organic rank climbed across every main keyword. The level of attention we got as a founding client was exceptional.',
-    name: '[Client Name]',
-    category: '[Product Category]',
+    name: 'Tyler T.',
+    category: 'Pet Supplies',
     result: 'ACOS: 45% → 18%',
     accent: 'orange',
   },
   {
     quote:
       'The China FBA prep service eliminated the quality issues we\'d been battling for two years. Every batch arrives at Amazon\'s warehouse clean, labeled, and compliant. We haven\'t had a single FBA rejection since switching.',
-    name: '[Client Name]',
-    category: '[Product Category]',
+    name: 'James L.',
+    category: 'Sports & Outdoors',
     result: 'Zero FBA rejections',
     accent: 'amber',
   },
   {
     quote:
       'From zero to a fully live, advertising Amazon store in under 90 days. PGS handled everything — account setup, Brand Registry, A+ Content, PPC launch. We didn\'t have to learn Amazon. We just had to run our business.',
-    name: '[Client Name]',
-    category: '[Product Category]',
+    name: 'Ricardo C.',
+    category: 'Roasted Coffee',
     result: 'Live store in 90 days',
     accent: 'warm',
   },
@@ -102,11 +102,6 @@ export default function Testimonials() {
             )
           })}
         </div>
-
-        <p className="text-muted/30 text-xs text-center mt-8 tracking-wide">
-          {/* PLACEHOLDER — remove this line when testimonials are real */}
-          Placeholder testimonials — replace with real client quotes before launch.
-        </p>
 
       </div>
     </section>
