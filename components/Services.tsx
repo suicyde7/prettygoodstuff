@@ -12,7 +12,7 @@ const services = [
     milestones: ['Month 1 · Account setup & listings', 'Month 2 · FBA shipment & PPC launch', 'Month 3 · A+ Content & Brand Store'],
     accent: 'orange',
     backHeadline: '3-Month Roadmap',
-    backCallout: 'End of Month 3: A+ Content live, Brand Store live, 60-day performance report & Month 4+ retainer proposal delivered.',
+    backCallout: 'End of Month 3: your store is fully live, optimized, and advertising — with a clear Month 4+ growth plan.',
     backItems: [
       { phase: 'Month 1', result: 'Account setup, USPTO trademark filed, Brand Registry submitted, all ASINs live with full SEO & barcodes' },
       { phase: 'Month 2', result: 'First FBA shipment coordinated & received, PPC (Sponsored Products) launched with keyword targeting' },
