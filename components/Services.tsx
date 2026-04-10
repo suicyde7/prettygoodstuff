@@ -62,7 +62,7 @@ const services = [
 const styles: Record<string, {
   icon: string; for: string; ring: string;
   backTag: string; phase: string; callout: string;
-  milestone: string; hint: string;
+  milestone: string; milestoneRow: string; hint: string;
 }> = {
   orange: {
     icon: 'text-accent bg-accentLight border-accent/20',
@@ -72,6 +72,7 @@ const styles: Record<string, {
     phase: 'text-accent',
     callout: 'bg-accentLight border-accent/20 text-accent/80',
     milestone: 'text-accent/60',
+    milestoneRow: 'bg-accentLight border-accent/15',
     hint: 'text-accent/50',
   },
   amber: {
@@ -82,6 +83,7 @@ const styles: Record<string, {
     phase: 'text-amber-600',
     callout: 'bg-amber-50 border-amber-200 text-amber-700',
     milestone: 'text-amber-500/70',
+    milestoneRow: 'bg-amber-50 border-amber-200',
     hint: 'text-amber-500/50',
   },
   warm: {
@@ -92,6 +94,7 @@ const styles: Record<string, {
     phase: 'text-orange-800',
     callout: 'bg-orange-50 border-orange-200 text-orange-900',
     milestone: 'text-orange-700/60',
+    milestoneRow: 'bg-orange-50 border-orange-200',
     hint: 'text-orange-700/50',
   },
 }
@@ -163,14 +166,21 @@ export default function Services() {
                     <p className="text-muted text-sm leading-relaxed flex-grow">{body}</p>
 
                     {/* Milestones */}
-                    <div className="border-t border-border pt-5 mt-5 flex flex-col gap-2">
-                      {milestones.map((m) => (
-                        <p key={m} className={`text-[11px] font-medium tracking-wide ${s.milestone}`}>{m}</p>
-                      ))}
+                    <div className="border-t border-border pt-4 mt-auto flex flex-col gap-2">
+                      {milestones.map((m, mi) => {
+                        const [phase, ...rest] = m.split(' · ')
+                        return (
+                          <div key={mi} className={`flex items-center gap-3 px-3 py-2 rounded-md border ${s.milestoneRow}`}>
+                            <span className={`text-[10px] font-bold tracking-widest uppercase flex-shrink-0 ${s.phase}`}>{phase}</span>
+                            <span className="w-px h-3 bg-border flex-shrink-0" />
+                            <span className="text-[11px] text-muted font-medium">{rest.join(' · ')}</span>
+                          </div>
+                        )
+                      })}
                     </div>
 
                     {/* Flip hint */}
-                    <p className={`text-[10px] tracking-widest uppercase mt-4 ${s.hint}`}>
+                    <p className={`text-[10px] tracking-widest uppercase mt-3 ${s.hint}`}>
                       See full roadmap →
                     </p>
                   </div>
@@ -189,7 +199,7 @@ export default function Services() {
 
                     <h3 className="font-display font-semibold text-xl text-ink uppercase mb-5 leading-tight">{name}</h3>
 
-                    <div className="flex-grow flex flex-col justify-between mb-5">
+                    <div className="flex-grow flex flex-col justify-between mb-4">
                       {backItems.map((item, bi) => (
                         <div key={bi} className="flex items-start gap-3">
                           <span className={`text-[10px] font-bold tracking-widest uppercase mt-1 flex-shrink-0 w-24 ${s.phase}`}>{item.phase}</span>
@@ -198,7 +208,7 @@ export default function Services() {
                       ))}
                     </div>
 
-                    <div className={`rounded-md px-4 py-3 border text-xs leading-relaxed font-medium ${s.callout}`}>
+                    <div className={`mt-auto rounded-md px-4 py-3 border text-xs leading-relaxed font-medium ${s.callout}`}>
                       {backCallout}
                     </div>
                   </div>
