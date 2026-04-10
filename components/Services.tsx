@@ -138,7 +138,7 @@ export default function Services() {
                   style={{
                     transformStyle: 'preserve-3d',
                     transform: flipped[i] ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                    height: '520px',
+                    height: '600px',
                   }}
                 >
 
@@ -199,7 +199,7 @@ export default function Services() {
 
                     <h3 className="font-display font-semibold text-xl text-ink uppercase mb-5 leading-tight">{name}</h3>
 
-                    <div className="flex-grow flex flex-col justify-between mb-4">
+                    <div className="flex flex-col gap-3">
                       {backItems.map((item, bi) => (
                         <div key={bi} className="flex items-start gap-3">
                           <span className={`text-[10px] font-bold tracking-widest uppercase mt-1 flex-shrink-0 w-24 ${s.phase}`}>{item.phase}</span>
