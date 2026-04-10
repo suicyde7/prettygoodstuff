@@ -9,8 +9,7 @@ const services = [
     for: 'For brands not yet on Amazon',
     pain: 'Your product is ready. Amazon isn\'t.',
     body: 'Every month without a presence is revenue handed to your competitors. We take you from zero to a fully live, optimized, advertising store in 90 days — done right the first time.',
-    outcomes: ['Live, ranked store in 90 days', 'Lower launch costs vs. doing it wrong first'],
-    tags: ['Account Setup', 'SEO Listings', 'A+ Content', 'Brand Store', 'PPC Launch'],
+    milestones: ['Month 1 · Account setup & listings', 'Month 2 · FBA shipment & PPC launch', 'Month 3 · A+ Content & Brand Store'],
     accent: 'orange',
     backHeadline: '3-Month Roadmap',
     backCallout: 'End of Month 3: A+ Content live, Brand Store live, 60-day performance report & Month 4+ retainer proposal delivered.',
@@ -28,8 +27,7 @@ const services = [
     for: 'For existing sellers hitting a ceiling',
     pain: 'You\'re live. But ACOS is bleeding you dry.',
     body: 'Most accounts we audit have 15–25% of ad spend going to zero-converting terms — recoverable budget we find in month one. We take over PPC, listings, and account health, and turn the dials every week.',
-    outcomes: ['Avg. 20–35% ACOS reduction within 60 days', 'More margin, less guesswork'],
-    tags: ['PPC Management', 'Listing Refresh', 'Inventory Health', 'Account Monitoring', 'Monthly Reporting'],
+    milestones: ['Month 1 · PPC audit & keyword cull', 'Month 2 · Bid strategy & listing refresh', 'Monthly · P&L report & strategy call'],
     accent: 'amber',
     backHeadline: 'What we move, and when',
     backCallout: 'Most clients recover enough wasted ad spend in Month 1 to cover our management fee entirely.',
@@ -47,8 +45,7 @@ const services = [
     for: 'For sellers sourcing from China',
     pain: 'A defective batch sent to Amazon can destroy your store overnight.',
     body: 'If a defective batch reaches Amazon\'s warehouse, the damage is immediate — negative reviews, A-to-Z claims, account suspension. We inspect, prep, and ship from China, catching problems before they ever leave the source.',
-    outcomes: ['Stop defects before they reach Amazon', 'Save $0.50–$1.50/unit vs. US prep centers'],
-    tags: ['QC Inspection', 'FNSKU Labeling', 'Poly Bagging', 'Direct-to-FBA', 'Defect Prevention'],
+    milestones: ['Audit · Cost & compliance review', 'Prep plan · Per-ASIN checklist built', 'Execution · Inspect, label, ship to FBA'],
     accent: 'warm',
     backHeadline: 'Audit, plan, then execute',
     backCallout: 'Most sellers switching from US prep save $0.50–$1.50/unit. We run the numbers for you before you commit.',
@@ -63,41 +60,39 @@ const services = [
 ]
 
 const styles: Record<string, {
-  icon: string; tag: string; button: string; for: string; outcome: string;
-  ring: string; backTag: string; phase: string; callout: string;
+  icon: string; for: string; ring: string;
+  backTag: string; phase: string; callout: string;
+  milestone: string; hint: string;
 }> = {
   orange: {
     icon: 'text-accent bg-accentLight border-accent/20',
-    tag: 'border-accent/20 text-accent/80 bg-accentLight',
-    button: 'bg-accent text-white hover:bg-accentDark shadow-accent/30',
     for: 'text-accent/70 bg-accentLight border-accent/15',
-    outcome: 'text-accent',
     ring: 'group-hover:ring-accent',
     backTag: 'border-accent/25 text-accent bg-accentLight',
     phase: 'text-accent',
     callout: 'bg-accentLight border-accent/20 text-accent/80',
+    milestone: 'text-accent/60',
+    hint: 'text-accent/50',
   },
   amber: {
     icon: 'text-amber-600 bg-amber-50 border-amber-200',
-    tag: 'border-amber-200 text-amber-600/80 bg-amber-50',
-    button: 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-600/30',
     for: 'text-amber-600/70 bg-amber-50 border-amber-200',
-    outcome: 'text-amber-600',
     ring: 'group-hover:ring-amber-400',
     backTag: 'border-amber-200 text-amber-600 bg-amber-50',
     phase: 'text-amber-600',
     callout: 'bg-amber-50 border-amber-200 text-amber-700',
+    milestone: 'text-amber-500/70',
+    hint: 'text-amber-500/50',
   },
   warm: {
     icon: 'text-orange-800 bg-orange-50 border-orange-200',
-    tag: 'border-orange-200 text-orange-800/70 bg-orange-50',
-    button: 'bg-orange-800 text-white hover:bg-orange-900 shadow-orange-800/30',
     for: 'text-orange-800/70 bg-orange-50 border-orange-200',
-    outcome: 'text-orange-800',
     ring: 'group-hover:ring-orange-300',
     backTag: 'border-orange-200 text-orange-800 bg-orange-50',
     phase: 'text-orange-800',
     callout: 'bg-orange-50 border-orange-200 text-orange-900',
+    milestone: 'text-orange-700/60',
+    hint: 'text-orange-700/50',
   },
 }
 
@@ -126,7 +121,7 @@ export default function Services() {
 
         <div ref={ref}
           className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          {services.map(({ num, icon, name, for: forLabel, pain, body, outcomes, tags, accent, backHeadline, backCallout, backItems }, i) => {
+          {services.map(({ num, icon, name, for: forLabel, pain, body, milestones, accent, backHeadline, backCallout, backItems }, i) => {
             const s = styles[accent]
             return (
               <div
@@ -135,13 +130,12 @@ export default function Services() {
                 style={{ perspective: '1200px' }}
                 onClick={() => toggle(i)}
               >
-                {/* Flip container */}
                 <div
                   className="relative w-full transition-all duration-700"
                   style={{
                     transformStyle: 'preserve-3d',
                     transform: flipped[i] ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                    height: '720px',
+                    height: '520px',
                   }}
                 >
 
@@ -150,32 +144,35 @@ export default function Services() {
                     className={`absolute inset-0 flex flex-col p-8 bg-surface border border-border rounded-lg transition-all duration-300 group-hover:ring-2 ${s.ring} group-hover:shadow-xl group-hover:shadow-accent/10`}
                     style={{ backfaceVisibility: 'hidden' }}
                   >
-                    <div className="flex items-start justify-between mb-6">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-5">
                       <div className={`text-xl p-2.5 border rounded-md ${s.icon}`}>{icon}</div>
                       <span className="text-muted/30 text-xs font-light">{num}</span>
                     </div>
 
-                    <span className={`self-start text-[10px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full border mb-5 ${s.for}`}>
+                    {/* For badge */}
+                    <span className={`self-start text-[10px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full border mb-4 ${s.for}`}>
                       {forLabel}
                     </span>
 
+                    {/* Name + pain */}
                     <h3 className="font-display font-semibold text-2xl text-ink uppercase mb-2 leading-tight">{name}</h3>
-                    <p className="text-ink font-semibold text-sm mb-4 italic">"{pain}"</p>
-                    <p className="text-muted text-sm leading-relaxed mb-6 flex-grow">{body}</p>
+                    <p className="text-ink font-semibold text-sm italic mb-4">"{pain}"</p>
 
-                    <div className="bg-surfaceAlt rounded-md px-4 py-3 mb-6 space-y-1.5">
-                      {outcomes.map((o) => (
-                        <p key={o} className={`text-xs font-semibold flex items-center gap-2 ${s.outcome}`}>
-                          <span>→</span>{o}
-                        </p>
+                    {/* Body */}
+                    <p className="text-muted text-sm leading-relaxed flex-grow">{body}</p>
+
+                    {/* Milestones */}
+                    <div className="border-t border-border pt-5 mt-5 flex flex-col gap-2">
+                      {milestones.map((m) => (
+                        <p key={m} className={`text-[11px] font-medium tracking-wide ${s.milestone}`}>{m}</p>
                       ))}
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map((tag) => (
-                        <span key={tag} className={`border text-[10px] tracking-widest uppercase px-3 py-1 rounded-full ${s.tag}`}>{tag}</span>
-                      ))}
-                    </div>
+                    {/* Flip hint */}
+                    <p className={`text-[10px] tracking-widest uppercase mt-4 ${s.hint}`}>
+                      See full roadmap →
+                    </p>
                   </div>
 
                   {/* ── BACK ── */}
@@ -190,13 +187,13 @@ export default function Services() {
                       </span>
                     </div>
 
-                    <h3 className="font-display font-semibold text-2xl text-ink uppercase mb-5 leading-tight">{name}</h3>
+                    <h3 className="font-display font-semibold text-xl text-ink uppercase mb-5 leading-tight">{name}</h3>
 
                     <div className="flex-grow flex flex-col justify-between mb-5">
                       {backItems.map((item, bi) => (
                         <div key={bi} className="flex items-start gap-3">
                           <span className={`text-[10px] font-bold tracking-widest uppercase mt-1 flex-shrink-0 w-24 ${s.phase}`}>{item.phase}</span>
-                          <span className="text-sm text-muted leading-relaxed">{item.result}</span>
+                          <span className="text-xs text-muted leading-relaxed">{item.result}</span>
                         </div>
                       ))}
                     </div>
@@ -207,7 +204,6 @@ export default function Services() {
                   </div>
 
                 </div>
-
               </div>
             )
           })}
