@@ -10,6 +10,8 @@ const services = [
     pain: 'Your product is ready. Amazon isn\'t.',
     body: 'Every month without a presence is revenue handed to your competitors. We take you from zero to a fully live, optimized, advertising store in 90 days — done right the first time.',
     milestones: ['Month 1 · Account setup & listings', 'Month 2 · FBA shipment & PPC launch', 'Month 3 · A+ Content & Brand Store'],
+    toolHref: null,
+    toolLabel: null,
     accent: 'orange',
     backHeadline: '3-Month Roadmap',
     backCallout: 'End of Month 3: your store is fully live, optimized, and advertising — with a clear Month 4+ growth plan.',
@@ -28,6 +30,8 @@ const services = [
     pain: 'You\'re live. But ACOS is bleeding you dry.',
     body: 'Most accounts we audit have 15–25% of ad spend going to zero-converting terms — recoverable budget we find in month one. We take over PPC, listings, and account health, and turn the dials every week.',
     milestones: ['Month 1 · PPC audit & keyword cull', 'Month 2 · Bid strategy & listing refresh', 'Monthly · P&L report & strategy call'],
+    toolHref: null,
+    toolLabel: null,
     accent: 'amber',
     backHeadline: 'What we move, and when',
     backCallout: 'Most clients recover enough wasted ad spend in Month 1 to cover our management fee entirely.',
@@ -46,6 +50,8 @@ const services = [
     pain: 'A defective batch sent to Amazon can destroy your store overnight.',
     body: 'If a defective batch reaches Amazon\'s warehouse, the damage is immediate — negative reviews, A-to-Z claims, account suspension. We inspect, prep, and ship from China, catching problems before they ever leave the source.',
     milestones: ['Audit · Cost & compliance review', 'Prep plan · Per-ASIN checklist built', 'Execution · Inspect, label, ship to FBA'],
+    toolHref: '/tools/china-fba-savings',
+    toolLabel: 'Calculate your savings →',
     accent: 'warm',
     backHeadline: 'Audit, plan, then execute',
     backCallout: 'Most sellers switching from US prep save $0.50–$1.50/unit. We run the numbers for you before you commit.',
@@ -124,7 +130,7 @@ export default function Services() {
 
         <div ref={ref}
           className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          {services.map(({ num, icon, name, for: forLabel, pain, body, milestones, accent, backHeadline, backCallout, backItems }, i) => {
+          {services.map(({ num, icon, name, for: forLabel, pain, body, milestones, toolHref, toolLabel, accent, backHeadline, backCallout, backItems }, i) => {
             const s = styles[accent]
             return (
               <div
@@ -179,10 +185,21 @@ export default function Services() {
                       })}
                     </div>
 
-                    {/* Flip hint */}
-                    <p className={`text-[10px] tracking-widest uppercase mt-3 ${s.hint}`}>
-                      See full roadmap →
-                    </p>
+                    {/* Tool link + flip hint */}
+                    <div className="flex items-center justify-between mt-3">
+                      {toolHref && toolLabel ? (
+                        <a
+                          href={toolHref}
+                          onClick={e => e.stopPropagation()}
+                          className={`text-[10px] font-semibold tracking-widest uppercase underline underline-offset-2 ${s.hint} hover:opacity-80 transition-opacity`}
+                        >
+                          {toolLabel}
+                        </a>
+                      ) : <span />}
+                      <p className={`text-[10px] tracking-widest uppercase ${s.hint}`}>
+                        See full roadmap →
+                      </p>
+                    </div>
                   </div>
 
                   {/* ── BACK ── */}
