@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const plans = [
@@ -10,6 +11,7 @@ const plans = [
     forIf: 'You have a product and want to launch on Amazon the right way — fully set up, optimized, and advertising from day one.',
     price: '$3,000', originalPrice: '$4,500', discount: '33% off',
     unit: '3-month launch package',
+    pricingHref: undefined,
     features: [
       'Amazon Professional account setup',
       'Up to 5 ASINs — fully SEO-optimized',
@@ -37,6 +39,7 @@ const plans = [
     forIf: 'You\'re already selling but growth has stalled, ACOS is too high, and you\'re tired of leaving money on the table every month.',
     price: '$1,800', originalPrice: '$2,800', discount: '36% off',
     unit: 'per month',
+    pricingHref: undefined,
     features: [
       'Full PPC audit + ongoing management',
       'Keyword refresh (up to 10 ASINs)',
@@ -62,8 +65,9 @@ const plans = [
     tag: 'Add-On Service',
     service: 'China FBA Prep Center',
     forIf: 'You source from China and a bad batch has either already cost you — or you know it\'s only a matter of time. Cut defect risk, cut costs, ship direct to FBA.',
-    price: 'From $0.50', originalPrice: undefined, discount: undefined,
-    unit: 'per unit — volume discounts available',
+    price: 'From $0.55', originalPrice: undefined, discount: undefined,
+    unit: 'per unit · Standard tier, 1–499 units',
+    pricingHref: '/pricing/china-fba-prep',
     features: [
       'FNSKU labeling (Amazon-compliant)',
       'Poly bagging with suffocation warning',
@@ -176,7 +180,7 @@ export default function Pricing() {
 
         <div ref={ref}
           className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          {plans.map(({ num, tag, service, forIf, price, originalPrice, discount, unit, features, accent, steps }, i) => {
+          {plans.map(({ num, tag, service, forIf, price, originalPrice, discount, unit, pricingHref, features, accent, steps }, i) => {
             const s = styles[accent]
             return (
               <div
@@ -229,7 +233,7 @@ export default function Pricing() {
                       <p className={`text-xs tracking-widest uppercase mt-3 ${s.unit}`}>{unit}</p>
                     </div>
 
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 flex-grow">
                       {features.map((f) => (
                         <li key={f} className="flex items-start gap-3">
                           <span className={`text-sm mt-0.5 flex-shrink-0 ${s.check}`}>✓</span>
@@ -237,6 +241,15 @@ export default function Pricing() {
                         </li>
                       ))}
                     </ul>
+                    {pricingHref && (
+                      <Link
+                        href={pricingHref}
+                        onClick={e => e.stopPropagation()}
+                        className={`mt-4 self-start text-[10px] font-semibold tracking-widest uppercase underline underline-offset-2 ${s.unit} hover:opacity-80 transition-opacity`}
+                      >
+                        View full pricing →
+                      </Link>
+                    )}
                   </div>
 
                   {/* ── BACK ── */}
