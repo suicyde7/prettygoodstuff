@@ -39,6 +39,9 @@ type YesNo          = 'yes' | 'no'
 type LaunchTimeline = 'ready' | '3mo' | '6mo' | 'researching'
 
 interface Inputs {
+  keyword1:       string
+  keyword2:       string
+  keyword3:       string
   category:       string
   pricePoint:     string
   supplier:       YesNo
@@ -46,6 +49,7 @@ interface Inputs {
   trademark:      Trademark
   photos:         YesNo
   hasWebsite:     YesNo
+  websiteUrl:     string
   launchTimeline: LaunchTimeline
 }
 
@@ -201,25 +205,27 @@ function RadioGroup<T extends string>({ label, sublabel, options, value, onChang
 
 // ── Gate card ──────────────────────────────────────────────────────────────────
 
-function GateCard({ teaser, onUnlock }: { teaser: React.ReactNode; onUnlock: (name: string, email: string) => void }) {
+function GateCard({ onUnlock }: { onUnlock: (name: string, email: string) => void }) {
   const [name, setName]   = useState('')
   const [email, setEmail] = useState('')
   const isValid = /\S+@\S+\.\S+/.test(email)
   return (
     <div className="bg-surface border border-border rounded-lg p-8 flex flex-col items-center gap-6">
-      {teaser}
-      <div className="w-full border-t border-border pt-6 flex flex-col gap-4 max-w-sm mx-auto">
-        <div className="text-center">
-          <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Unlock Your Full Results</p>
-          <p className="text-muted text-xs leading-relaxed">Enter your email to see gaps, verdict, and your time-to-launch estimate.</p>
+      <div className="text-center">
+        <div className="w-16 h-16 rounded-full bg-accentLight border-2 border-accent/20 flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">▲</span>
         </div>
+        <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Your Score Is Ready</p>
+        <p className="text-muted text-xs leading-relaxed max-w-xs">Enter your email to see your Opportunity Score, Readiness Score, gaps to address, and your time-to-launch estimate.</p>
+      </div>
+      <div className="w-full flex flex-col gap-4 max-w-sm mx-auto">
         <input type="text" placeholder="First name (optional)" value={name} onChange={e => setName(e.target.value)}
           className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
         <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
           className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
         <button onClick={() => isValid && onUnlock(name.trim(), email.trim())} disabled={!isValid}
           className="group flex items-center justify-center gap-2 bg-accent text-white font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20">
-          See My Full Results
+          See My Score
           <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
         </button>
         <p className="text-muted/40 text-xs text-center">No spam. One follow-up with personalised recommendations.</p>
@@ -231,10 +237,20 @@ function GateCard({ teaser, onUnlock }: { teaser: React.ReactNode; onUnlock: (na
 // ── Defaults ───────────────────────────────────────────────────────────────────
 
 const defaultInputs: Inputs = {
+  keyword1: '', keyword2: '', keyword3: '',
   category: '', pricePoint: '',
   supplier: 'no', differentiated: 'somewhat',
   trademark: 'no', photos: 'no',
-  hasWebsite: 'no', launchTimeline: 'researching',
+  hasWebsite: 'no', websiteUrl: '',
+  launchTimeline: 'researching',
+}
+
+function buildTrendsUrl(keywords: string[]): string {
+  const items = keywords
+    .filter(k => k.trim())
+    .map(k => ({ keyword: k.trim(), geo: 'US', time: 'today 12-m' }))
+  const req = JSON.stringify({ comparisonItem: items, category: 0, property: '' })
+  return `https://trends.google.com/trends/embed/explore/TIMESERIES?req=${encodeURIComponent(req)}&tz=-300`
 }
 
 // ── Page ───────────────────────────────────────────────────────────────────────
@@ -250,7 +266,7 @@ export default function AmazonOpportunityPage() {
     setUnlocked(false)
   }
 
-  const isValid = inp.category !== '' && parseFloat(inp.pricePoint) > 0
+  const isValid = inp.keyword1.trim() !== '' && inp.category !== '' && parseFloat(inp.pricePoint) > 0
 
   function calculate() {
     if (!isValid) return
@@ -263,8 +279,13 @@ export default function AmazonOpportunityPage() {
     sendLead({
       tool:             'Opportunity Score',
       name, email,
+      keyword1:         inp.keyword1,
+      keyword2:         inp.keyword2 || '',
+      keyword3:         inp.keyword3 || '',
       category:         CATEGORIES[inp.category]?.label ?? inp.category,
       pricePoint:       parseFloat(inp.pricePoint) || 0,
+      hasWebsite:       inp.hasWebsite,
+      websiteUrl:       inp.websiteUrl || '',
       launchTimeline:   inp.launchTimeline,
       opportunityScore: results.opportunityScore,
       readinessScore:   results.readinessScore,
@@ -306,6 +327,32 @@ export default function AmazonOpportunityPage() {
           {/* Form */}
           <div className="bg-surface border border-border rounded-lg p-8 mb-8 flex flex-col gap-8">
 
+            {/* Keywords */}
+            <div>
+              <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Product keywords</label>
+              <p className="text-muted text-xs mb-3">Enter up to 3 search terms a customer would use to find your product. We'll show you the demand trend for each one.</p>
+              <div className="flex flex-col gap-3">
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest uppercase text-accent/60">01</span>
+                  <input type="text" placeholder="e.g. roasted coffee beans"
+                    value={inp.keyword1} onChange={e => set('keyword1', e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest uppercase text-muted/40">02</span>
+                  <input type="text" placeholder="e.g. ground coffee (optional)"
+                    value={inp.keyword2} onChange={e => set('keyword2', e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest uppercase text-muted/40">03</span>
+                  <input type="text" placeholder="e.g. whole bean coffee (optional)"
+                    value={inp.keyword3} onChange={e => set('keyword3', e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+              </div>
+            </div>
+
             {/* Category */}
             <div>
               <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Product category</label>
@@ -329,9 +376,6 @@ export default function AmazonOpportunityPage() {
                   value={inp.pricePoint} onChange={e => { set('pricePoint', e.target.value) }}
                   className="w-full bg-surfaceAlt border border-border rounded-lg pl-8 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
               </div>
-              {parseFloat(inp.pricePoint) > 0 && parseFloat(inp.pricePoint) < 20 && (
-                <p className="text-red-500 text-xs mt-1.5">Under $20 — FBA fees + referral fees will compress margin significantly.</p>
-              )}
               {parseFloat(inp.pricePoint) >= 25 && parseFloat(inp.pricePoint) <= 120 && (
                 <p className="text-green-600 text-xs mt-1.5">✓ Strong price point for FBA economics.</p>
               )}
@@ -384,6 +428,16 @@ export default function AmazonOpportunityPage() {
                 { value: 'no',  label: 'No',  sub: "Selling only on Amazon or haven't launched yet" },
               ]} />
 
+            {inp.hasWebsite === 'yes' && (
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Website URL</label>
+                <p className="text-muted text-xs mb-3">Paste your site URL — we'll take a look before your strategy call.</p>
+                <input type="url" placeholder="https://yourstore.com"
+                  value={inp.websiteUrl} onChange={e => set('websiteUrl', e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+              </div>
+            )}
+
             {/* Qualifying question */}
             <RadioGroup label="When are you planning to launch on Amazon?"
               sublabel="Helps us give you the most relevant advice"
@@ -405,29 +459,7 @@ export default function AmazonOpportunityPage() {
 
           {/* Gate */}
           {results && !unlocked && (
-            <GateCard
-              onUnlock={unlock}
-              teaser={
-                <div className="w-full flex flex-col items-center gap-4">
-                  <p className="text-muted text-xs tracking-widest uppercase">Your Scores</p>
-                  <div className="flex items-center justify-around w-full gap-6">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`w-20 h-20 rounded-full border-4 ${scoreColor(results.opportunityScore)} flex items-center justify-center`}>
-                        <span className={`font-display font-bold text-3xl leading-none ${scoreTextColor(results.opportunityScore)}`}>{results.opportunityScore}</span>
-                      </div>
-                      <p className="text-xs font-bold tracking-widest uppercase text-ink">Opportunity</p>
-                    </div>
-                    <div className="w-px bg-border self-stretch" />
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`w-20 h-20 rounded-full border-4 ${scoreColor(results.readinessScore)} flex items-center justify-center`}>
-                        <span className={`font-display font-bold text-3xl leading-none ${scoreTextColor(results.readinessScore)}`}>{results.readinessScore}</span>
-                      </div>
-                      <p className="text-xs font-bold tracking-widest uppercase text-ink">Readiness</p>
-                    </div>
-                  </div>
-                </div>
-              }
-            />
+            <GateCard onUnlock={unlock} />
           )}
 
           {/* Full results */}
@@ -474,9 +506,9 @@ export default function AmazonOpportunityPage() {
               {/* Gaps */}
               {results.gaps.length > 0 && (
                 <div className="bg-surface border border-border rounded-lg overflow-hidden">
-                  <div className="px-6 py-4 border-b border-border bg-surfaceAlt">
-                    <p className="text-xs font-bold tracking-widest uppercase text-ink">Gaps to Address</p>
-                    <p className="text-xs text-muted mt-0.5">Resolve these before investing in launch.</p>
+                  <div className="px-6 py-5 border-b border-border bg-surfaceAlt">
+                    <p className="font-display font-semibold text-lg text-ink uppercase">Gaps to Address</p>
+                    <p className="text-xs text-muted mt-1">Fix these before investing in your launch — blocking issues are marked in red.</p>
                   </div>
                   <div className="divide-y divide-border">
                     {results.gaps.map((gap, i) => (
@@ -501,6 +533,28 @@ export default function AmazonOpportunityPage() {
                 <div className="bg-green-50 border border-green-200 rounded-lg px-6 py-5">
                   <p className="text-sm font-semibold text-green-800 mb-1">No critical gaps identified</p>
                   <p className="text-xs text-green-700 leading-relaxed">Your inputs show strong market alignment and launch readiness. The next step is validating at the ASIN level — keyword research, competitor review count, and pricing analysis.</p>
+                </div>
+              )}
+
+              {/* Demand Trend */}
+              {inp.keyword1.trim() && (
+                <div className="bg-surface border border-border rounded-lg overflow-hidden">
+                  <div className="px-6 py-5 border-b border-border bg-surfaceAlt">
+                    <p className="font-display font-semibold text-lg text-ink uppercase">Demand Trend</p>
+                    <p className="text-xs text-muted mt-1">
+                      12-month Google search interest for {[inp.keyword1, inp.keyword2, inp.keyword3].filter(k => k.trim()).join(', ')} — powered by Google Trends.
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <iframe
+                      src={buildTrendsUrl([inp.keyword1, inp.keyword2, inp.keyword3])}
+                      className="w-full rounded-md"
+                      style={{ height: '380px', border: 'none' }}
+                      loading="lazy"
+                      title="Google Trends — keyword demand"
+                    />
+                    <p className="text-muted/40 text-xs mt-3 text-center">Interest shown on a 0–100 scale relative to peak popularity. 100 = highest search interest in the period.</p>
+                  </div>
                 </div>
               )}
 
