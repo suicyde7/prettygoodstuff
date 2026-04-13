@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { sendLead } from '@/lib/sendLead'
@@ -33,6 +33,8 @@ export default function ChinaFBASavingsPage() {
   const [shipments, setShipments]         = useState('')
   const [complexity, setComplexity]       = useState<Complexity>('standard')
   const [prepSituation, setPrepSituation] = useState<PrepSituation | ''>('')
+  const resultsRef = useRef<HTMLDivElement>(null)
+
   const [results, setResults] = useState<null | {
     savingsPerUnit: number; savingsPerShipment: number
     annualSavings: number; threeYearSavings: number
@@ -59,6 +61,7 @@ export default function ChinaFBASavingsPage() {
       chinaCost, noSavings: savingsPerUnit <= 0,
     }
     setResults(r)
+    setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
     sendLead({
       tool:               'China FBA Savings',
       name:               name.trim(),
@@ -213,7 +216,7 @@ export default function ChinaFBASavingsPage() {
 
           {/* Results */}
           {results && (
-            <div className="flex flex-col gap-4 animate-in fade-in duration-500">
+            <div ref={resultsRef} className="flex flex-col gap-4 animate-in fade-in duration-500">
 
               {results.noSavings ? (
                 <div className="bg-surface border border-border rounded-lg p-8 text-center">
