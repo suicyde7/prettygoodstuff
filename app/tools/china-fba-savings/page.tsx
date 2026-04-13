@@ -25,35 +25,6 @@ function fmt(n: number) {
 }
 function fmtUnit(n: number) { return `$${n.toFixed(2)}` }
 
-// ── Gate card ──────────────────────────────────────────────────────────────────
-
-function GateCard({ teaser, onUnlock }: { teaser: React.ReactNode; onUnlock: (name: string, email: string) => void }) {
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const isValid = /\S+@\S+\.\S+/.test(email)
-  return (
-    <div className="bg-surface border border-border rounded-lg p-8 flex flex-col items-center gap-6">
-      {teaser}
-      <div className="w-full border-t border-border pt-6 flex flex-col gap-4 max-w-sm mx-auto">
-        <div className="text-center">
-          <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Unlock Your Full Breakdown</p>
-          <p className="text-muted text-xs leading-relaxed">Enter your email to see the full cost comparison and savings breakdown.</p>
-        </div>
-        <input type="text" placeholder="First name (optional)" value={name} onChange={e => setName(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <button onClick={() => isValid && onUnlock(name.trim(), email.trim())} disabled={!isValid}
-          className="group flex items-center justify-center gap-2 bg-accent text-white font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20">
-          See My Full Results
-          <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
-        </button>
-        <p className="text-muted/40 text-xs text-center">No spam. One follow-up with personalised recommendations.</p>
-      </div>
-    </div>
-  )
-}
-
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function ChinaFBASavingsPage() {
@@ -62,13 +33,14 @@ export default function ChinaFBASavingsPage() {
   const [shipments, setShipments]         = useState('')
   const [complexity, setComplexity]       = useState<Complexity>('standard')
   const [prepSituation, setPrepSituation] = useState<PrepSituation | ''>('')
-  const [results, setResults]             = useState<null | {
+  const [results, setResults] = useState<null | {
     savingsPerUnit: number; savingsPerShipment: number
     annualSavings: number; threeYearSavings: number
     currentAnnual: number; chinaAnnual: number
     chinaCost: number; noSavings: boolean
   }>(null)
-  const [unlocked, setUnlocked] = useState(false)
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
 
   function calculate() {
     const c = parseFloat(currentCost)
@@ -79,35 +51,32 @@ export default function ChinaFBASavingsPage() {
     const savingsPerUnit     = c - chinaCost
     const savingsPerShipment = savingsPerUnit * u
     const annualSavings      = savingsPerShipment * s
-    setResults({
+    const r = {
       savingsPerUnit, savingsPerShipment, annualSavings,
       threeYearSavings: annualSavings * 3,
       currentAnnual: c * u * s,
       chinaAnnual: chinaCost * u * s,
       chinaCost, noSavings: savingsPerUnit <= 0,
-    })
-    setUnlocked(false)
-  }
-
-  function unlock(name: string, email: string) {
-    if (!results) return
+    }
+    setResults(r)
     sendLead({
       tool:               'China FBA Savings',
-      name, email,
+      name:               name.trim(),
+      email:              email.trim(),
       prepSituation:      prepSituation || '',
-      currentCostPerUnit: parseFloat(currentCost),
-      unitsPerShipment:   parseInt(units),
-      shipmentsPerYear:   parseInt(shipments),
+      currentCostPerUnit: c,
+      unitsPerShipment:   u,
+      shipmentsPerYear:   s,
       complexityTier:     COMPLEXITY[complexity].label,
-      annualSavings:      Math.round(results.annualSavings),
-      unitsPerYear:       parseInt(units) * parseInt(shipments),
-      noSavings:          results.noSavings,
+      annualSavings:      Math.round(r.annualSavings),
+      unitsPerYear:       u * s,
+      noSavings:          r.noSavings,
     })
-    setUnlocked(true)
   }
 
   const isValid = currentCost && units && shipments &&
-    parseFloat(currentCost) > 0 && parseInt(units) > 0 && parseInt(shipments) > 0
+    parseFloat(currentCost) > 0 && parseInt(units) > 0 && parseInt(shipments) > 0 &&
+    /\S+@\S+\.\S+/.test(email)
 
   return (
     <div className="min-h-screen bg-surfaceAlt flex flex-col">
@@ -151,7 +120,7 @@ export default function ChinaFBASavingsPage() {
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm font-medium">$</span>
                   <input type="number" min="0" step="0.01" placeholder="2.00"
-                    value={currentCost} onChange={e => { setCurrentCost(e.target.value); setResults(null); setUnlocked(false) }}
+                    value={currentCost} onChange={e => { setCurrentCost(e.target.value); setResults(null) }}
                     className="w-full bg-surfaceAlt border border-border rounded-lg pl-8 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
               </div>
@@ -162,14 +131,14 @@ export default function ChinaFBASavingsPage() {
                   <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Units per shipment</label>
                   <p className="text-muted text-xs mb-3">Typical FBA batch size</p>
                   <input type="number" min="1" step="1" placeholder="500"
-                    value={units} onChange={e => { setUnits(e.target.value); setResults(null); setUnlocked(false) }}
+                    value={units} onChange={e => { setUnits(e.target.value); setResults(null) }}
                     className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Shipments per year</label>
                   <p className="text-muted text-xs mb-3">How often you restock</p>
                   <input type="number" min="1" step="1" placeholder="4"
-                    value={shipments} onChange={e => { setShipments(e.target.value); setResults(null); setUnlocked(false) }}
+                    value={shipments} onChange={e => { setShipments(e.target.value); setResults(null) }}
                     className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
               </div>
@@ -180,7 +149,7 @@ export default function ChinaFBASavingsPage() {
                 <p className="text-muted text-xs mb-3">Rates shown at 500–1,999 units/shipment (mid-volume tier). <a href="/pricing/china-fba-prep" className="underline underline-offset-2 hover:text-ink transition-colors">View full pricing →</a></p>
                 <div className="flex flex-col gap-2">
                   {(Object.entries(COMPLEXITY) as [Complexity, typeof COMPLEXITY[Complexity]][]).map(([key, { label, desc }]) => (
-                    <button key={key} type="button" onClick={() => { setComplexity(key); setResults(null); setUnlocked(false) }}
+                    <button key={key} type="button" onClick={() => { setComplexity(key); setResults(null) }}
                       className={`flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all duration-200 ${complexity === key ? 'border-accent bg-accentLight' : 'border-border bg-surfaceAlt hover:border-accent/30'}`}>
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${complexity === key ? 'border-accent bg-accent' : 'border-muted/30'}`}>
                         {complexity === key && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -201,7 +170,7 @@ export default function ChinaFBASavingsPage() {
                 <p className="text-muted text-xs mb-3">Helps us give you the most relevant comparison</p>
                 <div className="flex flex-col gap-2">
                   {PREP_OPTIONS.map(opt => (
-                    <button key={opt.value} type="button" onClick={() => { setPrepSituation(opt.value); setResults(null); setUnlocked(false) }}
+                    <button key={opt.value} type="button" onClick={() => { setPrepSituation(opt.value); setResults(null) }}
                       className={`flex items-center gap-4 p-3.5 rounded-lg border-2 text-left transition-all duration-150 ${prepSituation === opt.value ? 'border-accent bg-accentLight' : 'border-border bg-surfaceAlt hover:border-accent/30'}`}>
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${prepSituation === opt.value ? 'border-accent bg-accent' : 'border-muted/30'}`}>
                         {prepSituation === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -215,6 +184,23 @@ export default function ChinaFBASavingsPage() {
                 </div>
               </div>
 
+              {/* Name + Email */}
+              <div className="border-t border-border pt-6 flex flex-col gap-3">
+                <div>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Your name <span className="text-muted/40 font-normal normal-case tracking-normal">(optional)</span></label>
+                  <input type="text" placeholder="First name"
+                    value={name} onChange={e => setName(e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Email <span className="text-accent text-[10px]">required</span></label>
+                  <input type="email" placeholder="your@email.com"
+                    value={email} onChange={e => setEmail(e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                  <p className="text-muted/40 text-xs mt-1.5">No spam. One follow-up with personalised recommendations.</p>
+                </div>
+              </div>
+
               {/* Calculate */}
               <button onClick={calculate} disabled={!isValid}
                 className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-accent/30 ring-2 ring-accent/20">
@@ -225,29 +211,8 @@ export default function ChinaFBASavingsPage() {
             </div>
           </div>
 
-          {/* Gate */}
-          {results && !unlocked && (
-            <GateCard
-              onUnlock={unlock}
-              teaser={
-                results.noSavings ? (
-                  <div className="text-center w-full">
-                    <p className="font-display font-bold text-2xl text-ink uppercase mb-2">You're Already Efficient</p>
-                    <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">Your current prep cost is at or below our rates. Unlock to learn about QC inspection services that protect your account.</p>
-                  </div>
-                ) : (
-                  <div className="text-center w-full">
-                    <p className="text-muted text-xs tracking-widest uppercase mb-3">Estimated Annual Savings</p>
-                    <p className="font-display font-bold text-6xl gradient-text-accent leading-none mb-1">{fmt(results.annualSavings)}</p>
-                    <p className="text-muted text-sm">{fmt(results.threeYearSavings)} over 3 years</p>
-                  </div>
-                )
-              }
-            />
-          )}
-
-          {/* Full results */}
-          {results && unlocked && (
+          {/* Results */}
+          {results && (
             <div className="flex flex-col gap-4 animate-in fade-in duration-500">
 
               {results.noSavings ? (
