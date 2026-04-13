@@ -99,7 +99,7 @@ export default function ChinaFBASavingsPage() {
         <div className="max-w-2xl mx-auto">
 
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-10">
             <div className="inline-flex items-center gap-2 bg-surface border border-orange-200 text-orange-800 px-4 py-2 rounded-full mb-8 shadow-sm">
               <span className="text-[10px] font-bold tracking-widest uppercase">Free Tool · China FBA Prep</span>
             </div>
@@ -112,8 +112,22 @@ export default function ChinaFBASavingsPage() {
             </p>
           </div>
 
-          {/* Form */}
+          {/* View Full Pricing CTA */}
+          <a
+            href="/pricing/china-fba-prep"
+            className="flex items-center justify-between gap-4 bg-surface border-2 border-accent/30 hover:border-accent hover:bg-accentLight rounded-lg px-6 py-5 mb-8 transition-all duration-200 group"
+          >
+            <div>
+              <p className="font-display font-semibold text-base text-ink uppercase tracking-wide">View Full Pricing Card</p>
+              <p className="text-muted text-xs mt-0.5">All tiers, volume breaks, and service inclusions — before you calculate</p>
+            </div>
+            <span className="text-accent font-bold text-sm tracking-widest group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">→</span>
+          </a>
+
+          {/* Calculator */}
           <div className="bg-surface border border-border rounded-lg p-8 mb-8">
+            <p className="font-display font-semibold text-xl text-ink uppercase mb-6">Calculate Your Estimated Savings</p>
+            <div className="flex flex-col gap-7">
             <div className="flex flex-col gap-7">
 
               {/* Current prep cost */}
@@ -149,7 +163,7 @@ export default function ChinaFBASavingsPage() {
               {/* Complexity */}
               <div>
                 <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Prep complexity</label>
-                <p className="text-muted text-xs mb-3">Rates shown at 500–1,999 units/shipment (mid-volume tier). <a href="/pricing/china-fba-prep" className="underline underline-offset-2 hover:text-ink transition-colors">View full pricing →</a></p>
+                <p className="text-muted text-xs mb-3">Rates shown at 500–1,999 units/shipment (mid-volume tier)</p>
                 <div className="flex flex-col gap-2">
                   {(Object.entries(COMPLEXITY) as [Complexity, typeof COMPLEXITY[Complexity]][]).map(([key, { label, desc }]) => (
                     <button key={key} type="button" onClick={() => { setComplexity(key); setResults(null) }}
