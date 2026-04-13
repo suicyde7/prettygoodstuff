@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
-const INTERVAL_MS = 6000
+const INTERVAL_MS = 3000
 
 const SLIDES = [
   {
@@ -18,8 +18,8 @@ const SLIDES = [
     ],
     description: 'Expert Amazon management for brands launching and scaling — with China sourcing, FBA prep, and a guided seller platform coming soon.',
     ctas: [
-      { label: 'Book a Free Strategy Call', href: '#contact',   primary: true },
-      { label: 'See Services',              href: '#services',  primary: false },
+      { label: 'Book a Free Strategy Call', href: '#contact',  primary: true },
+      { label: 'See Services',              href: '#services', primary: false },
     ],
   },
   {
@@ -29,9 +29,9 @@ const SLIDES = [
       className: 'bg-surface border border-orange-200 text-orange-800',
     },
     headline: [
-      { text: 'Is Your Product',   className: 'gradient-text' },
-      { text: 'Ready to',          className: 'text-ink/15' },
-      { text: 'Launch?',           className: 'gradient-text-accent' },
+      { text: 'Is Your Product', className: 'gradient-text' },
+      { text: 'Ready to',        className: 'text-ink/15' },
+      { text: 'Launch?',         className: 'gradient-text-accent' },
     ],
     description: "Not a revenue predictor. A reality check. Answer 6 questions and find out how strong your market opportunity is — and exactly what's standing between you and a live store.",
     ctas: [
@@ -45,9 +45,9 @@ const SLIDES = [
       className: 'bg-surface border border-orange-200 text-orange-800',
     },
     headline: [
-      { text: 'Is Your Listing',   className: 'gradient-text' },
-      { text: 'Leaking',           className: 'text-ink/15' },
-      { text: 'Conversions?',      className: 'gradient-text-accent' },
+      { text: 'Is Your Listing', className: 'gradient-text' },
+      { text: 'Leaking',         className: 'text-ink/15' },
+      { text: 'Conversions?',    className: 'gradient-text-accent' },
     ],
     description: 'Paste your title and bullet points. Get a full audit with a letter grade, score breakdown, and a prioritized fix list — in 60 seconds.',
     ctas: [
@@ -61,9 +61,9 @@ const SLIDES = [
       className: 'bg-surface border border-orange-200 text-orange-800',
     },
     headline: [
-      { text: 'How Much Are You',  className: 'gradient-text' },
-      { text: 'Overpaying',        className: 'text-ink/15' },
-      { text: 'for Prep?',         className: 'gradient-text-accent' },
+      { text: 'How Much Are You', className: 'gradient-text' },
+      { text: 'Overpaying',       className: 'text-ink/15' },
+      { text: 'for Prep?',        className: 'gradient-text-accent' },
     ],
     description: "Most FBA sellers using a US prep center are overpaying by $0.50–$1.50 per unit. Enter your numbers and find out what that's costing you annually.",
     ctas: [
@@ -73,46 +73,47 @@ const SLIDES = [
 ]
 
 export default function Hero() {
-  const [loaded, setLoaded]     = useState(false)
-  const [active, setActive]     = useState(0)
+  const [loaded, setLoaded]   = useState(false)
+  const [active, setActive]   = useState(0)
   const [progress, setProgress] = useState(0)
-  const [paused, setPaused]     = useState(false)
-  const intervalRef             = useRef<ReturnType<typeof setInterval> | null>(null)
-  const progressRef             = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startRef              = useRef<number>(Date.now())
+  const rafRef                = useRef<number | null>(null)
 
+  // Advance to a specific slide and reset the timer
   const goTo = useCallback((idx: number) => {
     setActive(idx)
     setProgress(0)
+    startRef.current = Date.now()
   }, [])
 
-  const next = useCallback(() => {
-    setActive(prev => (prev + 1) % SLIDES.length)
-    setProgress(0)
+  // Single rAF loop — drives both progress bar and slide advance
+  useEffect(() => {
+    startRef.current = Date.now()
+
+    function tick() {
+      const elapsed = Date.now() - startRef.current
+      const pct = Math.min((elapsed / INTERVAL_MS) * 100, 100)
+      setProgress(pct)
+
+      if (elapsed >= INTERVAL_MS) {
+        startRef.current = Date.now()
+        setActive(prev => (prev + 1) % SLIDES.length)
+        setProgress(0)
+      }
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [])
 
-  useEffect(() => {
-    if (paused) return
-    intervalRef.current = setInterval(next, INTERVAL_MS)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [paused, next])
-
-  useEffect(() => {
-    if (paused) { setProgress(0); return }
-    const tick = 50
-    progressRef.current = setInterval(() => {
-      setProgress(prev => Math.min(prev + (tick / INTERVAL_MS) * 100, 100))
-    }, tick)
-    return () => { if (progressRef.current) clearInterval(progressRef.current) }
-  }, [paused, active])
+  // When goTo resets startRef, the rAF loop picks it up automatically — no restart needed
 
   useEffect(() => { setLoaded(true) }, [])
 
   return (
-    <section
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-surfaceAlt"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-surfaceAlt">
       {/* Warm glow shapes */}
       <div className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none" />
@@ -125,7 +126,7 @@ export default function Hero() {
             i === active ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div className={`relative z-10 px-8 max-w-7xl mx-auto w-full pt-16 md:pt-44 pb-16 md:pb-28 transition-all duration-700 delay-100 ${
+          <div className={`relative z-10 px-8 max-w-7xl mx-auto w-full pt-16 md:pt-44 pb-24 md:pb-36 transition-all duration-700 delay-100 ${
             loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
 
@@ -150,7 +151,7 @@ export default function Hero() {
                 {slide.description}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                {(slide.ctas ?? []).map((cta, ci) =>
+                {slide.ctas.map((cta, ci) =>
                   cta.primary ? (
                     <Link
                       key={ci}
@@ -177,8 +178,18 @@ export default function Hero() {
         </div>
       ))}
 
-      {/* Nav — dots + progress bar, pinned to bottom */}
-      <div className="absolute bottom-8 left-0 right-0 z-20 px-8 max-w-7xl mx-auto w-full">
+      {/* ── Centered nav + progress bar ── */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3 w-64">
+
+        {/* Progress bar */}
+        <div className="w-full h-[3px] bg-border rounded-full overflow-hidden">
+          <div
+            className="h-full bg-accent rounded-full"
+            style={{ width: `${progress}%`, transition: 'none' }}
+          />
+        </div>
+
+        {/* Dots + counter */}
         <div className="flex items-center gap-3">
           {SLIDES.map((_, i) => (
             <button
@@ -186,23 +197,17 @@ export default function Hero() {
               onClick={() => goTo(i)}
               className={`transition-all duration-300 rounded-full ${
                 i === active
-                  ? 'w-8 h-1.5 bg-accent'
+                  ? 'w-6 h-1.5 bg-accent'
                   : 'w-1.5 h-1.5 bg-border hover:bg-muted/40'
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}
-          {/* Progress bar */}
-          <div className="flex-1 h-px bg-border ml-2">
-            <div
-              className="h-full bg-accent/50"
-              style={{ width: `${progress}%`, transition: 'none' }}
-            />
-          </div>
-          <span className="text-[10px] text-muted/40 tracking-widest tabular-nums">
+          <span className="ml-1 text-[10px] text-muted/40 tracking-widest tabular-nums">
             {String(active + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
           </span>
         </div>
+
       </div>
 
     </section>
