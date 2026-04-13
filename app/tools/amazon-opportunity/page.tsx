@@ -203,37 +203,6 @@ function RadioGroup<T extends string>({ label, sublabel, options, value, onChang
   )
 }
 
-// ── Gate card ──────────────────────────────────────────────────────────────────
-
-function GateCard({ onUnlock }: { onUnlock: (name: string, email: string) => void }) {
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const isValid = /\S+@\S+\.\S+/.test(email)
-  return (
-    <div className="bg-surface border border-border rounded-lg p-8 flex flex-col items-center gap-6">
-      <div className="text-center">
-        <div className="w-16 h-16 rounded-full bg-accentLight border-2 border-accent/20 flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">▲</span>
-        </div>
-        <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Your Score Is Ready</p>
-        <p className="text-muted text-xs leading-relaxed max-w-xs">Enter your email to see your Opportunity Score, Readiness Score, gaps to address, and your time-to-launch estimate.</p>
-      </div>
-      <div className="w-full flex flex-col gap-4 max-w-sm mx-auto">
-        <input type="text" placeholder="First name (optional)" value={name} onChange={e => setName(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <button onClick={() => isValid && onUnlock(name.trim(), email.trim())} disabled={!isValid}
-          className="group flex items-center justify-center gap-2 bg-accent text-white font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20">
-          See My Score
-          <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
-        </button>
-        <p className="text-muted/40 text-xs text-center">No spam. One follow-up with personalised recommendations.</p>
-      </div>
-    </div>
-  )
-}
-
 // ── Defaults ───────────────────────────────────────────────────────────────────
 
 const defaultInputs: Inputs = {
@@ -258,27 +227,24 @@ function buildTrendsUrl(keywords: string[]): string {
 export default function AmazonOpportunityPage() {
   const [inp, setInp]         = useState<Inputs>(defaultInputs)
   const [results, setResults] = useState<Results | null>(null)
-  const [unlocked, setUnlocked] = useState(false)
+  const [name, setName]       = useState('')
+  const [email, setEmail]     = useState('')
 
   function set<K extends keyof Inputs>(key: K, val: Inputs[K]) {
     setInp(prev => ({ ...prev, [key]: val }))
     setResults(null)
-    setUnlocked(false)
   }
 
-  const isValid = inp.keyword1.trim() !== '' && inp.category !== '' && parseFloat(inp.pricePoint) > 0
+  const isValid = inp.keyword1.trim() !== '' && inp.category !== '' && parseFloat(inp.pricePoint) > 0 && /\S+@\S+\.\S+/.test(email)
 
   function calculate() {
     if (!isValid) return
-    setResults(computeResults(inp))
-    setUnlocked(false)
-  }
-
-  function unlock(name: string, email: string) {
-    if (!results) return
+    const r = computeResults(inp)
+    setResults(r)
     sendLead({
       tool:             'Opportunity Score',
-      name, email,
+      name:             name.trim(),
+      email:            email.trim(),
       keyword1:         inp.keyword1,
       keyword2:         inp.keyword2 || '',
       keyword3:         inp.keyword3 || '',
@@ -287,11 +253,10 @@ export default function AmazonOpportunityPage() {
       hasWebsite:       inp.hasWebsite,
       websiteUrl:       inp.websiteUrl || '',
       launchTimeline:   inp.launchTimeline,
-      opportunityScore: results.opportunityScore,
-      readinessScore:   results.readinessScore,
-      verdict:          results.verdict,
+      opportunityScore: r.opportunityScore,
+      readinessScore:   r.readinessScore,
+      verdict:          r.verdict,
     })
-    setUnlocked(true)
   }
 
   return (
@@ -449,6 +414,23 @@ export default function AmazonOpportunityPage() {
                 { value: 'researching', label: 'Just researching', sub: 'Early stage, exploring options' },
               ]} />
 
+            {/* Name + Email */}
+            <div className="border-t border-border pt-6 flex flex-col gap-3">
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Your name <span className="text-muted/40 font-normal normal-case tracking-normal">(optional)</span></label>
+                <input type="text" placeholder="First name"
+                  value={name} onChange={e => setName(e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Email <span className="text-accent text-[10px]">required</span></label>
+                <input type="email" placeholder="your@email.com"
+                  value={email} onChange={e => setEmail(e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                <p className="text-muted/40 text-xs mt-1.5">No spam. One follow-up with personalised recommendations.</p>
+              </div>
+            </div>
+
             {/* Submit */}
             <button onClick={calculate} disabled={!isValid}
               className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-accent/30 ring-2 ring-accent/20">
@@ -457,13 +439,8 @@ export default function AmazonOpportunityPage() {
             </button>
           </div>
 
-          {/* Gate */}
-          {results && !unlocked && (
-            <GateCard onUnlock={unlock} />
-          )}
-
           {/* Full results */}
-          {results && unlocked && (
+          {results && (
             <div className="flex flex-col gap-4 animate-in fade-in duration-500">
 
               {/* Score rings */}
