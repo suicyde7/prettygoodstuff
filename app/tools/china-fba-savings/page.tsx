@@ -5,10 +5,11 @@ import Image from 'next/image'
 
 type Complexity = 'simple' | 'standard' | 'full'
 
+// Costs reflect PGS published pricing at 500–1,999 unit tier (mid-volume)
 const COMPLEXITY: Record<Complexity, { cost: number; label: string; desc: string }> = {
-  simple:   { cost: 0.30, label: 'Simple',       desc: 'FNSKU label only' },
-  standard: { cost: 0.45, label: 'Standard',     desc: 'Poly bag + FNSKU label' },
-  full:     { cost: 0.60, label: 'Full Service',  desc: 'QC inspection + poly bag + label + carton prep' },
+  simple:   { cost: 0.45, label: 'Standard',     desc: 'FNSKU label only' },
+  standard: { cost: 0.60, label: 'Premium',       desc: 'Poly bag + FNSKU label' },
+  full:     { cost: 0.78, label: 'Full Service',  desc: 'QC inspection + poly bag + label + carton prep' },
 }
 
 function fmt(n: number) {
@@ -158,9 +159,10 @@ export default function ChinaFBASavingsPage() {
 
               {/* Complexity */}
               <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-3">
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
                   Prep complexity
                 </label>
+                <p className="text-muted text-xs mb-3">Rates shown at 500–1,999 units/shipment (mid-volume tier). <a href="/pricing/china-fba-prep" className="underline underline-offset-2 hover:text-ink transition-colors">View full pricing →</a></p>
                 <div className="flex flex-col gap-2">
                   {(Object.entries(COMPLEXITY) as [Complexity, typeof COMPLEXITY[Complexity]][]).map(([key, { label, desc }]) => (
                     <button

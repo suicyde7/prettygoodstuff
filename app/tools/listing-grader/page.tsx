@@ -81,27 +81,27 @@ function scoreInputs(inp: Inputs): Results {
 
   const images = parseInt(inp.imageCount) || 0
   let imagePts = 0
-  if (images >= 7) imagePts = 15
-  else if (images === 6) imagePts = 12
-  else if (images === 5) imagePts = 9
+  if (images >= 9) imagePts = 15
+  else if (images >= 7) imagePts = 12
+  else if (images >= 5) imagePts = 9
   else imagePts = 5
   const imageGap = 15 - imagePts
   breakdown.push({
     factor: 'Image Count',
     earned: imagePts, max: 15,
-    label: images >= 7 ? '7+ images (full gallery)' : `${images} image${images !== 1 ? 's' : ''}`,
-    tip: images < 7 ? `You have ${images} image${images !== 1 ? 's' : ''}. Fill all 7 slots — lifestyle, infographic, size chart, close-up.` : null,
+    label: images >= 9 ? '9 images (full gallery)' : `${images} image${images !== 1 ? 's' : ''}`,
+    tip: images < 9 ? `You have ${images} image${images !== 1 ? 's' : ''}. Amazon allows up to 9 — fill every slot with lifestyle, infographic, size chart, and close-up shots.` : null,
   })
-  if (imageGap > 0) fixes.push({ impact: imageGap, text: `Add ${7 - images} more image${7 - images > 1 ? 's' : ''} to fill your gallery — lifestyle shots and infographics lift CTR significantly.` })
+  if (imageGap > 0) fixes.push({ impact: imageGap, text: `Add ${9 - images} more image${9 - images > 1 ? 's' : ''} — Amazon allows 9 total. Lifestyle shots and infographics are the highest-converting additions.` })
 
   const videoPts = inp.hasVideo === 'yes' ? 10 : 0
   breakdown.push({
     factor: 'Product Video',
     earned: videoPts, max: 10,
     label: inp.hasVideo === 'yes' ? 'Video present' : 'No video',
-    tip: inp.hasVideo === 'no' ? 'Listings with video convert 3–5× better on mobile. Even a 30-second product demo makes a measurable difference.' : null,
+    tip: inp.hasVideo === 'no' ? 'Listings with video typically see 10–30% higher conversion rates. Even a 30-second product demo makes a measurable difference.' : null,
   })
-  if (videoPts === 0) fixes.push({ impact: 10, text: `Add a product video. Listings with video convert 3–5× better on mobile — this is a high-leverage gap.` })
+  if (videoPts === 0) fixes.push({ impact: 10, text: `Add a product video. Listings with video typically see 10–30% higher conversion — one of the highest-leverage upgrades available.` })
 
   const aPlusMap: Record<ThreeOption, number> = { yes: 20, no: 0, unknown: 0 }
   const aPlusPts = aPlusMap[inp.hasAPlus]
@@ -119,9 +119,9 @@ function scoreInputs(inp: Inputs): Results {
     factor: 'Brand Store',
     earned: brandStorePts, max: 5,
     label: inp.hasBrandStore === 'yes' ? 'Brand Store live' : 'No Brand Store',
-    tip: inp.hasBrandStore === 'no' ? 'A Brand Store protects your listing from competitor ads and gives you a second indexable landing page on Amazon.' : null,
+    tip: inp.hasBrandStore === 'no' ? 'A Brand Store gives you a dedicated brand page on Amazon with no competitor ads on it, and is required to run Sponsored Brands video ads.' : null,
   })
-  if (brandStorePts === 0) fixes.push({ impact: 5, text: `Create a Brand Store — it blocks competitor ads from appearing on your listing and improves brand discoverability.` })
+  if (brandStorePts === 0) fixes.push({ impact: 5, text: `Create a Brand Store — your dedicated Amazon brand page has no competitor ads and unlocks Sponsored Brands video ad formats.` })
 
   const backendMap: Record<BackendKeywords, number> = { full: 10, partial: 5, no: 0, unknown: 0 }
   const backendPts = backendMap[inp.backendKeywords]
@@ -139,9 +139,9 @@ function scoreInputs(inp: Inputs): Results {
     factor: 'Brand Registry',
     earned: brandRegPts, max: 5,
     label: inp.brandRegistry === 'yes' ? 'Enrolled' : 'Not enrolled',
-    tip: inp.brandRegistry === 'no' ? 'Brand Registry unlocks A+ Content, Brand Store, Sponsored Brands, and Vine. If you have a trademark, enroll now.' : null,
+    tip: inp.brandRegistry === 'no' ? 'Brand Registry unlocks A+ Content, Brand Store, and Sponsored Brands. Amazon Vine is also gated behind Brand Registry (note: Vine enrollment costs $200/parent ASIN). Requires a registered trademark.' : null,
   })
-  if (brandRegPts === 0) fixes.push({ impact: 5, text: `Enroll in Brand Registry — it unlocks A+ Content, Brand Store, Sponsored Brands ads, and Amazon Vine.` })
+  if (brandRegPts === 0) fixes.push({ impact: 5, text: `Enroll in Brand Registry — it unlocks A+ Content, Brand Store, and Sponsored Brands ads. Vine requires Brand Registry plus a $200/ASIN enrollment fee.` })
 
   const total = breakdown.reduce((sum, b) => sum + b.earned, 0)
 
@@ -351,13 +351,13 @@ export default function ListingGraderPage() {
             {/* Image count */}
             <RadioGroup
               label="Number of images"
-              sublabel="How many images are in your listing gallery? (main image + secondaries)"
+              sublabel="How many images are in your listing gallery? (main image + secondaries — Amazon allows up to 9)"
               value={inp.imageCount as any}
               onChange={v => set('imageCount', v)}
               options={[
-                { value: '7', label: '7+', sub: 'Full gallery — main + 6 secondary' },
-                { value: '6', label: '6',  sub: 'One slot unused' },
-                { value: '5', label: '5',  sub: 'Two slots unused' },
+                { value: '9', label: '9',  sub: 'Full gallery — all slots used' },
+                { value: '7', label: '7–8', sub: '1–2 slots unused' },
+                { value: '5', label: '5–6', sub: '3–4 slots unused' },
                 { value: '3', label: '4 or fewer', sub: 'Multiple gallery slots unused' },
               ]}
             />

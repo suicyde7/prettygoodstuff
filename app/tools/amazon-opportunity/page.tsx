@@ -78,12 +78,12 @@ function computeResults(inp: Inputs): Results {
   else if (cat.competition === 'medium') opp += 15
   else opp += 5  // high competition
 
-  // Price point — sweet spot is $18–$60 for FBA economics
-  if (price >= 25 && price <= 60) opp += 20
-  else if (price >= 18 && price < 25) opp += 14
-  else if (price > 60 && price <= 120) opp += 12
-  else if (price > 120) opp += 8
-  else opp += 4  // under $18 — tough margins after FBA fees
+  // Price point — sweet spot is $20–$120 for FBA economics
+  // $60–$120 is equally strong: same fixed FBA fee, higher ASP = better margin %
+  if (price >= 25 && price <= 120) opp += 20
+  else if (price >= 20 && price < 25) opp += 14
+  else if (price > 120) opp += 10
+  else opp += 4  // under $20 — tough margins after FBA + referral fees
 
   // Differentiation lifts opportunity
   if (inp.differentiated === 'yes') opp += 15
@@ -131,7 +131,7 @@ function computeResults(inp: Inputs): Results {
   if (inp.trademark === 'no') {
     gaps.push({
       title: 'No trademark — Brand Registry locked out',
-      body: 'Without Brand Registry you can\'t use A+ Content, Brand Store, Sponsored Brands, or Amazon Vine. These are now table stakes for competitive listings. File a trademark immediately.',
+      body: 'Without Brand Registry you can\'t use A+ Content, Brand Store, Sponsored Brands ads, or Amazon Vine. In 2025 these are table stakes — listings without them convert at a significant disadvantage. File a USPTO trademark now (takes 8–12 months; an IP Accelerator filing can unlock Brand Registry in weeks).',
       blocking: false,
     })
   }
@@ -144,10 +144,10 @@ function computeResults(inp: Inputs): Results {
     })
   }
 
-  if (price > 0 && price < 18) {
+  if (price > 0 && price < 20) {
     gaps.push({
       title: `Price point too low for FBA ($${price})`,
-      body: 'After FBA fulfillment fees, referral fees, and PPC, products under $18 rarely generate meaningful margin. You\'d need extraordinary volume to make it work.',
+      body: 'After FBA fulfillment fees (~$3.31+ for a standard item), referral fees (8–15%), and minimum PPC spend, products under $20 rarely generate meaningful margin. You\'d need extraordinary volume to make the economics work.',
       blocking: false,
     })
   }
@@ -374,10 +374,10 @@ export default function AmazonOpportunityPage() {
                   className="w-full bg-surfaceAlt border border-border rounded-lg pl-8 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
-              {parseFloat(inp.pricePoint) > 0 && parseFloat(inp.pricePoint) < 18 && (
-                <p className="text-red-500 text-xs mt-1.5">Under $18 — FBA fees will compress margin significantly.</p>
+              {parseFloat(inp.pricePoint) > 0 && parseFloat(inp.pricePoint) < 20 && (
+                <p className="text-red-500 text-xs mt-1.5">Under $20 — FBA fees + referral fees will compress margin significantly.</p>
               )}
-              {parseFloat(inp.pricePoint) >= 25 && parseFloat(inp.pricePoint) <= 60 && (
+              {parseFloat(inp.pricePoint) >= 25 && parseFloat(inp.pricePoint) <= 120 && (
                 <p className="text-green-600 text-xs mt-1.5">✓ Strong price point for FBA economics.</p>
               )}
             </div>
