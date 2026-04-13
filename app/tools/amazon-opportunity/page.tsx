@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { sendLead } from '@/lib/sendLead'
 
 // ── Category data ─────────────────────────────────────────────────────────────
 // demand: high = strong search volume, medium = solid niche, competitive = saturated
@@ -321,7 +322,19 @@ export default function AmazonOpportunityPage() {
 
   function calculate() {
     if (!isValid) return
-    setResults(computeResults(inp))
+    const res = computeResults(inp)
+    setResults(res)
+    sendLead({
+      tool:             'Opportunity Score',
+      name:             inp.name.trim(),
+      email:            inp.email.trim(),
+      websiteUrl:       inp.websiteUrl.trim(),
+      category:         CATEGORIES[inp.category]?.label ?? inp.category,
+      pricePoint:       parseFloat(inp.pricePoint) || 0,
+      opportunityScore: res.opportunityScore,
+      readinessScore:   res.readinessScore,
+      verdict:          res.verdict,
+    })
   }
 
   return (

@@ -2,6 +2,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { sendLead } from '@/lib/sendLead'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -375,7 +376,18 @@ export default function ListingGraderPage() {
 
   function grade() {
     if (!isValid) return
-    setResults(scoreInputs(inp))
+    const res = scoreInputs(inp)
+    setResults(res)
+    sendLead({
+      tool:       'Listing Grader',
+      name:       inp.name.trim(),
+      email:      inp.email.trim(),
+      listingUrl: inp.listingUrl.trim(),
+      score:      res.total,
+      grade:      res.grade,
+      gradeLabel: res.gradeLabel,
+      topFix:     res.fixes[0]?.text ?? '',
+    })
   }
 
   const gc = results ? gradeColors[results.grade] : null

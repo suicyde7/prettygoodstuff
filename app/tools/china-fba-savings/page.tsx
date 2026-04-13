@@ -2,8 +2,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { sendLead } from '@/lib/sendLead'
 
 type Complexity = 'simple' | 'standard' | 'full'
+type PrepSituation = 'us_3pl' | 'self_prep' | 'no_prep' | 'already_china'
 
 // Costs reflect PGS published pricing at 500–1,999 unit tier (mid-volume)
 const COMPLEXITY: Record<Complexity, { cost: number; label: string; desc: string }> = {
@@ -11,6 +13,13 @@ const COMPLEXITY: Record<Complexity, { cost: number; label: string; desc: string
   standard: { cost: 0.60, label: 'Premium',       desc: 'Poly bag + FNSKU label' },
   full:     { cost: 0.78, label: 'Full Service',  desc: 'QC inspection + poly bag + label + carton prep' },
 }
+
+const PREP_OPTIONS: { value: PrepSituation; label: string; sub: string }[] = [
+  { value: 'us_3pl',        label: 'US 3PL / prep center',          sub: 'Paying a third-party warehouse in the US to prep' },
+  { value: 'self_prep',     label: 'Self-prepping in the US',        sub: 'Doing it in-house before sending to FBA' },
+  { value: 'no_prep',       label: "I don't have a prep solution yet", sub: 'Still figuring out the logistics' },
+  { value: 'already_china', label: 'Already using a China service',  sub: 'Looking to compare or switch' },
+]
 
 function fmt(n: number) {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
@@ -20,11 +29,14 @@ function fmtUnit(n: number) {
 }
 
 export default function ChinaFBASavingsPage() {
-  const [currentCost, setCurrentCost]           = useState('')
-  const [units, setUnits]                       = useState('')
-  const [shipments, setShipments]               = useState('')
-  const [complexity, setComplexity]             = useState<Complexity>('standard')
-  const [results, setResults]                   = useState<null | {
+  const [currentCost, setCurrentCost]     = useState('')
+  const [units, setUnits]                 = useState('')
+  const [shipments, setShipments]         = useState('')
+  const [complexity, setComplexity]       = useState<Complexity>('standard')
+  const [prepSituation, setPrepSituation] = useState<PrepSituation | ''>('')
+  const [name, setName]                   = useState('')
+  const [email, setEmail]                 = useState('')
+  const [results, setResults]             = useState<null | {
     savingsPerUnit: number
     savingsPerShipment: number
     annualSavings: number
@@ -49,7 +61,7 @@ export default function ChinaFBASavingsPage() {
     const currentAnnual       = c * u * s
     const chinaAnnual         = chinaCost * u * s
 
-    setResults({
+    const res = {
       savingsPerUnit,
       savingsPerShipment,
       annualSavings,
@@ -58,6 +70,22 @@ export default function ChinaFBASavingsPage() {
       chinaAnnual,
       chinaCost,
       noSavings: savingsPerUnit <= 0,
+    }
+
+    setResults(res)
+
+    sendLead({
+      tool:          'China FBA Savings',
+      name:          name.trim(),
+      email:         email.trim(),
+      prepSituation: prepSituation || '',
+      currentCostPerUnit: c,
+      unitsPerShipment:   u,
+      shipmentsPerYear:   s,
+      complexityTier:     COMPLEXITY[complexity].label,
+      annualSavings:      Math.round(annualSavings),
+      unitsPerYear:       u * s,
+      noSavings:          savingsPerUnit <= 0,
     })
   }
 
@@ -191,6 +219,72 @@ export default function ChinaFBASavingsPage() {
                       </span>
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Current prep situation */}
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                  Where are you currently prepping?
+                </label>
+                <p className="text-muted text-xs mb-3">Helps us give you the most relevant comparison</p>
+                <div className="flex flex-col gap-2">
+                  {PREP_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { setPrepSituation(opt.value); setResults(null) }}
+                      className={`flex items-center gap-4 p-3.5 rounded-lg border-2 text-left transition-all duration-150 ${
+                        prepSituation === opt.value
+                          ? 'border-accent bg-accentLight'
+                          : 'border-border bg-surfaceAlt hover:border-accent/30'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        prepSituation === opt.value ? 'border-accent bg-accent' : 'border-muted/30'
+                      }`}>
+                        {prepSituation === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </div>
+                      <div>
+                        <p className={`text-xs font-bold tracking-widest uppercase ${prepSituation === opt.value ? 'text-accent' : 'text-ink'}`}>
+                          {opt.label}
+                        </p>
+                        <p className="text-muted text-xs mt-0.5">{opt.sub}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contact */}
+              <div className="border-t border-border pt-2">
+                <p className="text-xs font-bold tracking-widest uppercase text-ink mb-1">Your details</p>
+                <p className="text-muted text-xs mb-5">So we can reach out before your call with a personalised cost breakdown.</p>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                      Name <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="First name"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                      Email <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="you@yourbrand.com"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+                    />
+                  </div>
                 </div>
               </div>
 
