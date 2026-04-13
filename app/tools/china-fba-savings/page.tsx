@@ -128,7 +128,6 @@ export default function ChinaFBASavingsPage() {
           <div className="bg-surface border border-border rounded-lg p-8 mb-8">
             <p className="font-display font-semibold text-xl text-ink uppercase mb-6">Calculate Your Estimated Savings</p>
             <div className="flex flex-col gap-7">
-            <div className="flex flex-col gap-7">
 
               {/* Current prep cost */}
               <div>
