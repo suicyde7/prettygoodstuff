@@ -245,9 +245,9 @@ export default function Pricing() {
                       <Link
                         href={pricingHref}
                         onClick={e => e.stopPropagation()}
-                        className={`mt-4 self-start text-[10px] font-semibold tracking-widest uppercase underline underline-offset-2 ${s.unit} hover:opacity-80 transition-opacity`}
+                        className={`mt-4 flex items-center justify-center gap-2 text-xs font-bold tracking-widest uppercase px-4 py-3 rounded-lg border-2 transition-all duration-200 hover:opacity-80 ${s.tag}`}
                       >
-                        View full pricing →
+                        View Full Pricing →
                       </Link>
                     )}
                   </div>
