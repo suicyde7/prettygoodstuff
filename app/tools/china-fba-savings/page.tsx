@@ -218,7 +218,9 @@ export default function ChinaFBASavingsPage() {
                   <p className="text-muted text-sm leading-relaxed max-w-sm mx-auto">
                     Your current prep cost per unit ({fmtUnit(parseFloat(currentCost))}) is at or below what
                     China prep typically costs for {COMPLEXITY[complexity].label.toLowerCase()} service.
-                    That said, our China prep includes built-in QC inspection — which most US centers don't offer.
+                    {complexity === 'full'
+                      ? " That said, our Full Service includes pre-shipment QC inspection — which most US centers don't offer at any price."
+                      : " If defect risk is a concern, our Full Service adds pre-shipment QC inspection for a small premium."}
                   </p>
                   <a href="https://calendly.com/welcome-prettygoodstuff/30min"
                     target="_blank" rel="noopener noreferrer"

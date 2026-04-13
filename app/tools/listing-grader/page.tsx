@@ -119,9 +119,9 @@ function scoreInputs(inp: Inputs): Results {
     factor: 'Brand Store',
     earned: brandStorePts, max: 5,
     label: inp.hasBrandStore === 'yes' ? 'Brand Store live' : 'No Brand Store',
-    tip: inp.hasBrandStore === 'no' ? 'A Brand Store gives you a dedicated brand page on Amazon with no competitor ads on it, and is required to run Sponsored Brands video ads.' : null,
+    tip: inp.hasBrandStore === 'no' ? 'A Brand Store gives you a dedicated brand page on Amazon with no competitor ads on it, and is required to run Sponsored Brands Store Spotlight ads.' : null,
   })
-  if (brandStorePts === 0) fixes.push({ impact: 5, text: `Create a Brand Store — your dedicated Amazon brand page has no competitor ads and unlocks Sponsored Brands video ad formats.` })
+  if (brandStorePts === 0) fixes.push({ impact: 5, text: `Create a Brand Store — your dedicated Amazon brand page has no competitor ads and is required for Sponsored Brands Store Spotlight ads.` })
 
   const backendMap: Record<BackendKeywords, number> = { full: 10, partial: 5, no: 0, unknown: 0 }
   const backendPts = backendMap[inp.backendKeywords]
