@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { sendLead } from '@/lib/sendLead'
@@ -64,26 +64,26 @@ function scoreInputs(inp: Inputs): Results {
   const fixes: { impact: number; text: string }[] = []
 
   // Title
-  const titleLen  = inp.title.trim().length
-  let titlePts    = titleLen >= 150 ? 15 : titleLen >= 80 ? 8 : 0
-  const titleGap  = 15 - titlePts
+  const titleLen = inp.title.trim().length
+  const titlePts = titleLen >= 150 ? 15 : titleLen >= 80 ? 8 : 0
+  const titleGap = 15 - titlePts
   breakdown.push({
     factor: 'Title Length', earned: titlePts, max: 15,
     label: titleLen >= 150 ? `Strong — ${titleLen} chars` : titleLen >= 80 ? `Moderate — ${titleLen} chars` : titleLen > 0 ? `Thin — ${titleLen} chars` : 'Not provided',
-    tip: titleLen > 0 && titleLen < 150 ? `Your title is ${titleLen} characters. Aim for 150+ — you have room for ${150 - titleLen} more.` : titleLen === 0 ? 'Paste your title above to score this factor.' : null,
+    tip: titleLen > 0 && titleLen < 150 ? `Your title is ${titleLen} characters. Aim for 150+ — you have room for ${150 - titleLen} more.` : titleLen === 0 ? 'No title provided — score assumes 0.' : null,
   })
   if (titleGap > 0 && titleLen > 0) fixes.push({ impact: titleGap, text: `Expand your title to 150+ characters — ${150 - titleLen} more characters of keyword indexing available.` })
 
   // Bullets count
-  const bulletArr   = parseBullets(inp.bullets)
-  const bulletCount = bulletArr.length
-  const depth       = assessBulletDepth(bulletArr)
-  let bulletCountPts = bulletCount >= 5 ? 10 : bulletCount === 4 ? 7 : bulletCount === 3 ? 4 : 0
+  const bulletArr    = parseBullets(inp.bullets)
+  const bulletCount  = bulletArr.length
+  const depth        = assessBulletDepth(bulletArr)
+  const bulletCountPts = bulletCount >= 5 ? 10 : bulletCount === 4 ? 7 : bulletCount === 3 ? 4 : 0
   const bulletCountGap = 10 - bulletCountPts
   breakdown.push({
     factor: 'Bullet Point Count', earned: bulletCountPts, max: 10,
     label: bulletCount === 0 ? 'Not provided' : `${bulletCount} bullet${bulletCount !== 1 ? 's' : ''}${bulletCount >= 5 ? ' (max)' : ''}`,
-    tip: bulletCount > 0 && bulletCount < 5 ? `You have ${bulletCount} bullet${bulletCount !== 1 ? 's' : ''}. Use all 5 — each is a keyword and conversion opportunity.` : bulletCount === 0 ? 'Paste your bullet points above to score this.' : null,
+    tip: bulletCount > 0 && bulletCount < 5 ? `You have ${bulletCount} bullet${bulletCount !== 1 ? 's' : ''}. Use all 5 — each is a keyword and conversion opportunity.` : null,
   })
   if (bulletCountGap > 0 && bulletCount > 0) fixes.push({ impact: bulletCountGap, text: `Add ${5 - bulletCount} more bullet point${5 - bulletCount > 1 ? 's' : ''} — unused conversion real estate.` })
 
@@ -99,7 +99,7 @@ function scoreInputs(inp: Inputs): Results {
   if (depthGap > 0 && bulletCount > 0) fixes.push({ impact: depthGap, text: 'Rewrite bullets to lead with customer benefits. Each should be 15+ words — one clear benefit claim per bullet.' })
 
   // Images
-  const images  = parseInt(inp.imageCount) || 0
+  const images   = parseInt(inp.imageCount) || 0
   const imagePts = images >= 9 ? 15 : images >= 7 ? 12 : images >= 5 ? 9 : 5
   const imageGap = 15 - imagePts
   breakdown.push({
@@ -214,59 +214,6 @@ function ScoreBar({ earned, max }: { earned: number; max: number }) {
   )
 }
 
-function TitleCounter({ len }: { len: number }) {
-  if (len === 0) return null
-  if (len >= 150) return <p className="text-green-600 text-xs mt-1.5">✓ {len} characters — strong</p>
-  if (len >= 80)  return <p className="text-amber-600 text-xs mt-1.5">{len} characters — {150 - len} more to reach the 150+ target</p>
-  return <p className="text-red-500 text-xs mt-1.5">{len} characters — too short, significant keyword gap</p>
-}
-
-function BulletPreview({ bullets }: { bullets: string[] }) {
-  if (bullets.length === 0) return null
-  const depth = assessBulletDepth(bullets)
-  const avg   = Math.round(bullets.reduce((s, b) => s + b.split(/\s+/).length, 0) / bullets.length)
-  return (
-    <div className="mt-2 bg-surfaceAlt border border-border rounded-md px-3 py-2.5 flex flex-col gap-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-ink font-semibold">{bullets.length} bullet{bullets.length !== 1 ? 's' : ''} detected</span>
-        <span className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full border ${depth === 'detailed' ? 'bg-green-100 text-green-700 border-green-200' : depth === 'mixed' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-red-100 text-red-600 border-red-200'}`}>
-          {depth === 'detailed' ? 'Detailed' : depth === 'mixed' ? 'Mixed depth' : 'Too short'}
-        </span>
-      </div>
-      <p className="text-muted text-xs">avg {avg} words/bullet · {depth === 'detailed' ? 'Solid depth' : depth === 'mixed' ? 'Some bullets need expanding' : 'Aim for 15+ words per bullet'}</p>
-    </div>
-  )
-}
-
-// ── Gate card ─────────────────────────────────────────────────────────────────
-
-function GateCard({ teaser, onUnlock }: { teaser: React.ReactNode; onUnlock: (name: string, email: string) => void }) {
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const isValid = /\S+@\S+\.\S+/.test(email)
-  return (
-    <div className="bg-surface border border-border rounded-lg p-8 flex flex-col items-center gap-6">
-      {teaser}
-      <div className="w-full border-t border-border pt-6 flex flex-col gap-4 max-w-sm mx-auto">
-        <div className="text-center">
-          <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Unlock Your Full Results</p>
-          <p className="text-muted text-xs leading-relaxed">Enter your email to see the full score breakdown and fix list.</p>
-        </div>
-        <input type="text" placeholder="First name (optional)" value={name} onChange={e => setName(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
-          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
-        <button onClick={() => isValid && onUnlock(name.trim(), email.trim())} disabled={!isValid}
-          className="group flex items-center justify-center gap-2 bg-accent text-white font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20">
-          See My Full Results
-          <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
-        </button>
-        <p className="text-muted/40 text-xs text-center">No spam. One follow-up with personalised recommendations.</p>
-      </div>
-    </div>
-  )
-}
-
 // ── Defaults ───────────────────────────────────────────────────────────────────
 
 const defaultInputs: Inputs = {
@@ -278,38 +225,33 @@ const defaultInputs: Inputs = {
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function ListingGraderPage() {
-  const [inp, setInp]         = useState<Inputs>(defaultInputs)
+  const [inp, setInp]     = useState<Inputs>(defaultInputs)
   const [results, setResults] = useState<Results | null>(null)
-  const [unlocked, setUnlocked] = useState(false)
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
 
   function set<K extends keyof Inputs>(key: K, val: Inputs[K]) {
     setInp(prev => ({ ...prev, [key]: val }))
     setResults(null)
-    setUnlocked(false)
   }
 
   const titleLen  = inp.title.trim().length
-  const bulletArr = useMemo(() => parseBullets(inp.bullets), [inp.bullets])
-  const isValid   = (titleLen > 0 || bulletArr.length > 0) && inp.imageCount !== ''
+  const isValid   = (titleLen > 0 || inp.bullets.trim().length > 0) && inp.imageCount !== '' && /\S+@\S+\.\S+/.test(email)
 
   function grade() {
     if (!isValid) return
-    setResults(scoreInputs(inp))
-    setUnlocked(false)
-  }
-
-  function unlock(name: string, email: string) {
-    if (!results) return
+    const r = scoreInputs(inp)
+    setResults(r)
     sendLead({
       tool:       'Listing Grader',
-      name, email,
-      score:      results.total,
-      grade:      results.grade,
-      gradeLabel: results.gradeLabel,
+      name:       name.trim(),
+      email:      email.trim(),
+      score:      r.total,
+      grade:      r.grade,
+      gradeLabel: r.gradeLabel,
       launchAge:  inp.launchAge,
-      topFix:     results.fixes[0]?.text ?? '',
+      topFix:     r.fixes[0]?.text ?? '',
     })
-    setUnlocked(true)
   }
 
   const gc = results ? gradeColors[results.grade] : null
@@ -355,7 +297,6 @@ export default function ListingGraderPage() {
                 placeholder="e.g. Stainless Steel Insulated Water Bottle 32oz — Leak Proof, BPA Free, Wide Mouth Lid, Keeps Drinks Cold 24 Hours Hot 12 Hours — for Gym, Hiking, Office"
                 value={inp.title} onChange={e => set('title', e.target.value)}
                 className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors resize-none leading-relaxed" />
-              <TitleCounter len={titleLen} />
             </div>
 
             {/* Bullets */}
@@ -366,7 +307,6 @@ export default function ListingGraderPage() {
                 placeholder={`STAY HYDRATED ALL DAY — double-wall vacuum insulation keeps drinks cold 24 hours\nLEAK-PROOF GUARANTEED — patented lid seals completely\n...`}
                 value={inp.bullets} onChange={e => set('bullets', e.target.value)}
                 className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors resize-none leading-relaxed" />
-              <BulletPreview bullets={bulletArr} />
             </div>
 
             {/* Images */}
@@ -432,6 +372,23 @@ export default function ListingGraderPage() {
                 { value: '1yr+',   label: 'Over a year',      sub: 'Long-running listing' },
               ]} />
 
+            {/* Name + Email */}
+            <div className="border-t border-border pt-6 flex flex-col gap-3">
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Your name <span className="text-muted/40 font-normal normal-case tracking-normal">(optional)</span></label>
+                <input type="text" placeholder="First name"
+                  value={name} onChange={e => setName(e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Email <span className="text-accent text-[10px]">required</span></label>
+                <input type="email" placeholder="your@email.com"
+                  value={email} onChange={e => setEmail(e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+                <p className="text-muted/40 text-xs mt-1.5">No spam. One follow-up with personalised recommendations.</p>
+              </div>
+            </div>
+
             {/* Submit */}
             <button onClick={grade} disabled={!isValid}
               className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-accent/30 ring-2 ring-accent/20">
@@ -440,24 +397,8 @@ export default function ListingGraderPage() {
             </button>
           </div>
 
-          {/* Results gate + full results */}
-          {results && !unlocked && gc && (
-            <GateCard
-              onUnlock={unlock}
-              teaser={
-                <div className="text-center w-full">
-                  <p className="text-muted text-xs tracking-widest uppercase mb-4">Your Listing Grade</p>
-                  <div className={`w-24 h-24 rounded-full border-4 ${gc.ring} flex items-center justify-center mx-auto mb-3`}>
-                    <span className={`font-display font-bold text-5xl leading-none ${gc.score}`}>{results.grade}</span>
-                  </div>
-                  <p className={`text-sm font-bold tracking-widest uppercase ${gc.score}`}>{results.gradeLabel}</p>
-                  <p className="text-muted text-xs mt-1">{results.total}/100 points</p>
-                </div>
-              }
-            />
-          )}
-
-          {results && unlocked && gc && (
+          {/* Full results */}
+          {results && gc && (
             <div className="flex flex-col gap-4 animate-in fade-in duration-500">
 
               {/* Score header */}
@@ -466,16 +407,15 @@ export default function ListingGraderPage() {
                 <div className={`w-24 h-24 rounded-full border-4 ${gc.ring} flex items-center justify-center`}>
                   <span className={`font-display font-bold text-5xl leading-none ${gc.score}`}>{results.grade}</span>
                 </div>
-                <div>
-                  <span className={`text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border ${gc.badge}`}>{results.gradeLabel}</span>
-                </div>
+                <span className={`text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border ${gc.badge}`}>{results.gradeLabel}</span>
                 <p className="text-muted text-xs">{results.total} / 100 points</p>
               </div>
 
               {/* Score breakdown */}
               <div className="bg-surface border border-border rounded-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-border bg-surfaceAlt">
-                  <p className="text-xs font-bold tracking-widest uppercase text-ink">Score Breakdown</p>
+                <div className="px-6 py-5 border-b border-border bg-surfaceAlt">
+                  <p className="font-display font-semibold text-lg text-ink uppercase">Score Breakdown</p>
+                  <p className="text-xs text-muted mt-1">How each factor contributed to your grade.</p>
                 </div>
                 <div className="divide-y divide-border">
                   {results.breakdown.map((b, i) => (
@@ -494,9 +434,9 @@ export default function ListingGraderPage() {
               {/* Fix list */}
               {results.fixes.length > 0 && (
                 <div className="bg-surface border border-border rounded-lg overflow-hidden">
-                  <div className="px-6 py-4 border-b border-border bg-surfaceAlt">
-                    <p className="text-xs font-bold tracking-widest uppercase text-ink">Priority Fix List</p>
-                    <p className="text-xs text-muted mt-0.5">Ordered by conversion impact — fix the top ones first.</p>
+                  <div className="px-6 py-5 border-b border-border bg-surfaceAlt">
+                    <p className="font-display font-semibold text-lg text-ink uppercase">Priority Fix List</p>
+                    <p className="text-xs text-muted mt-1">Ordered by conversion impact — fix the top ones first.</p>
                   </div>
                   <div className="divide-y divide-border">
                     {results.fixes.map((fix, i) => (
