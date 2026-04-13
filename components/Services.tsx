@@ -155,18 +155,7 @@ export default function Services() {
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between mb-5">
-                      <div className="flex items-center gap-3">
-                        <div className={`text-xl p-2.5 border rounded-md flex-shrink-0 ${s.icon}`}>{icon}</div>
-                        {toolHref && toolLabel && (
-                          <a
-                            href={toolHref}
-                            onClick={e => e.stopPropagation()}
-                            className={`inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full border-2 transition-all duration-200 hover:opacity-80 ${s.for}`}
-                          >
-                            {toolLabel}
-                          </a>
-                        )}
-                      </div>
+                      <div className={`text-xl p-2.5 border rounded-md flex-shrink-0 ${s.icon}`}>{icon}</div>
                       <span className="text-muted/30 text-xs font-light flex-shrink-0">{num}</span>
                     </div>
 
@@ -183,18 +172,28 @@ export default function Services() {
                     <p className="text-muted text-sm leading-relaxed flex-grow">{body}</p>
 
                     {/* Milestones */}
-                    <div className="border-t border-border pt-4 mt-auto flex flex-col gap-2">
+                    <div className="border-t border-border pt-4 mt-auto flex flex-col gap-2.5">
                       {milestones.map((m, mi) => {
                         const [phase, ...rest] = m.split(' · ')
                         return (
-                          <div key={mi} className={`flex items-center gap-3 px-3 py-2 rounded-md border ${s.milestoneRow}`}>
-                            <span className={`text-[10px] font-bold tracking-widest uppercase flex-shrink-0 ${s.phase}`}>{phase}</span>
-                            <span className="w-px h-3 bg-border flex-shrink-0" />
-                            <span className="text-[11px] text-muted font-medium">{rest.join(' · ')}</span>
+                          <div key={mi} className="flex items-start gap-3">
+                            <span className={`text-[10px] font-bold tracking-widest uppercase flex-shrink-0 w-14 pt-0.5 ${s.phase}`}>{phase}</span>
+                            <span className="text-xs text-muted leading-relaxed">{rest.join(' · ')}</span>
                           </div>
                         )
                       })}
                     </div>
+
+                    {/* Tool button */}
+                    {toolHref && toolLabel && (
+                      <a
+                        href={toolHref}
+                        onClick={e => e.stopPropagation()}
+                        className={`mt-4 flex items-center justify-center gap-2 text-xs font-bold tracking-widest uppercase px-4 py-3 rounded-lg border-2 transition-all duration-200 hover:opacity-80 ${s.for}`}
+                      >
+                        {toolLabel}
+                      </a>
+                    )}
 
                     {/* Flip hint */}
                     <div className="flex items-center justify-end mt-3">

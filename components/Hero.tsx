@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
-const INTERVAL_MS = 3000
+const INTERVAL_MS = 6000
 
 const SLIDES = [
   {
@@ -14,12 +14,12 @@ const SLIDES = [
     headline: [
       { text: 'Launch on Amazon.', className: 'gradient-text' },
       { text: 'Source from China.', className: 'text-ink/15' },
-      { text: 'Grow Your Brand.',   className: 'gradient-text-accent' },
+      { text: 'Grow Your Brand.', className: 'gradient-text-accent' },
     ],
     description: 'Expert Amazon management for brands launching and scaling — with China sourcing, FBA prep, and a guided seller platform coming soon.',
     ctas: [
-      { label: 'Book a Free Strategy Call', href: '#contact',  primary: true },
-      { label: 'See Services',              href: '#services', primary: false },
+      { label: 'Book a Free Strategy Call', href: 'https://calendly.com/welcome-prettygoodstuff/30min', primary: true },
+      { label: 'See Services', href: '#services', primary: false },
     ],
   },
   {
@@ -30,8 +30,8 @@ const SLIDES = [
     },
     headline: [
       { text: 'Is Your Product', className: 'gradient-text' },
-      { text: 'Ready to',        className: 'text-ink/15' },
-      { text: 'Launch?',         className: 'gradient-text-accent' },
+      { text: 'Ready to', className: 'text-ink/15' },
+      { text: 'Launch?', className: 'gradient-text-accent' },
     ],
     description: "Not a revenue predictor. A reality check. Answer 6 questions and find out how strong your market opportunity is — and exactly what's standing between you and a live store.",
     ctas: [
@@ -46,8 +46,8 @@ const SLIDES = [
     },
     headline: [
       { text: 'Is Your Listing', className: 'gradient-text' },
-      { text: 'Leaking',         className: 'text-ink/15' },
-      { text: 'Conversions?',    className: 'gradient-text-accent' },
+      { text: 'Leaking', className: 'text-ink/15' },
+      { text: 'Conversions?', className: 'gradient-text-accent' },
     ],
     description: 'Paste your title and bullet points. Get a full audit with a letter grade, score breakdown, and a prioritized fix list — in 60 seconds.',
     ctas: [
@@ -62,8 +62,8 @@ const SLIDES = [
     },
     headline: [
       { text: 'How Much Are You', className: 'gradient-text' },
-      { text: 'Overpaying',       className: 'text-ink/15' },
-      { text: 'for Prep?',        className: 'gradient-text-accent' },
+      { text: 'Overpaying', className: 'text-ink/15' },
+      { text: 'for Prep?', className: 'gradient-text-accent' },
     ],
     description: "Most FBA sellers using a US prep center are overpaying by $0.50–$1.50 per unit. Enter your numbers and find out what that's costing you annually.",
     ctas: [
@@ -73,11 +73,11 @@ const SLIDES = [
 ]
 
 export default function Hero() {
-  const [loaded, setLoaded]   = useState(false)
-  const [active, setActive]   = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const [active, setActive] = useState(0)
   const [progress, setProgress] = useState(0)
-  const startRef              = useRef<number>(Date.now())
-  const rafRef                = useRef<number | null>(null)
+  const startRef = useRef<number>(Date.now())
+  const rafRef = useRef<number | null>(null)
 
   // Advance to a specific slide and reset the timer
   const goTo = useCallback((idx: number) => {
@@ -122,13 +122,11 @@ export default function Hero() {
       {SLIDES.map((slide, i) => (
         <div
           key={i}
-          className={`absolute inset-0 flex flex-col justify-center transition-opacity duration-700 ${
-            i === active ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`absolute inset-0 flex flex-col justify-center transition-opacity duration-700 ${i === active ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
         >
-          <div className={`relative z-10 px-8 max-w-7xl mx-auto w-full pt-16 md:pt-44 pb-24 md:pb-36 transition-all duration-700 delay-100 ${
-            loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}>
+          <div className={`relative z-10 px-8 max-w-7xl mx-auto w-full pt-16 md:pt-44 pb-24 md:pb-36 transition-all duration-700 delay-100 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}>
 
             {/* Badge */}
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-10 shadow-sm ${slide.badge.className}`}>
@@ -156,6 +154,8 @@ export default function Hero() {
                     <Link
                       key={ci}
                       href={cta.href}
+                      target={cta.href.startsWith('http') ? '_blank' : undefined}
+                      rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                       className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full shadow-xl shadow-accent/30 ring-2 ring-accent/20"
                     >
                       {cta.label}
@@ -195,11 +195,10 @@ export default function Hero() {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`transition-all duration-300 rounded-full ${
-                i === active
-                  ? 'w-6 h-1.5 bg-accent'
-                  : 'w-1.5 h-1.5 bg-border hover:bg-muted/40'
-              }`}
+              className={`transition-all duration-300 rounded-full ${i === active
+                ? 'w-6 h-1.5 bg-accent'
+                : 'w-1.5 h-1.5 bg-border hover:bg-muted/40'
+                }`}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}

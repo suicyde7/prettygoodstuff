@@ -172,7 +172,7 @@ export default function Pricing() {
 
         {/* Urgency banner */}
         <div className="flex items-center gap-3 bg-accent/10 border border-accent/20 rounded-lg px-6 py-4 mb-10">
-          <span className="w-2 h-2 rounded-full bg-accent animate-pulse flex-shrink-0" />
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
           <p className="text-accent text-xs font-semibold tracking-wide">
             Founding spots are limited. Once filled, pricing moves to standard agency rates. Your founding rate locks in for 12 months from sign-on.
           </p>

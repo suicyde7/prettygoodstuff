@@ -9,7 +9,6 @@ const navLinks = [
   { num: '02', label: 'Pricing',  href: '#pricing' },
   { num: '03', label: 'Platform', href: '#platform' },
   { num: '04', label: 'FAQ',      href: '#faq' },
-  { num: '05', label: 'Contact',  href: '#contact' },
 ]
 
 const tools = [
@@ -126,9 +125,9 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <LanguageSwitcher />
-          <a href="#contact"
+          <a href="https://calendly.com/welcome-prettygoodstuff/30min" target="_blank" rel="noopener noreferrer"
             className="bg-accent text-white text-xs font-semibold tracking-widest uppercase px-6 py-3 hover:bg-accentDark transition-colors duration-200 rounded-full">
-            Let's Talk
+            Book a Call
           </a>
         </div>
 
