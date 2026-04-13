@@ -156,7 +156,7 @@ export default function Hero() {
                     <Link
                       key={ci}
                       href={cta.href}
-                      className="group flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-8 py-4 hover:bg-accentDark transition-all duration-200 rounded-full shadow-lg shadow-accent/20"
+                      className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full shadow-xl shadow-accent/30 ring-2 ring-accent/20"
                     >
                       {cta.label}
                       <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
@@ -165,7 +165,7 @@ export default function Hero() {
                     <Link
                       key={ci}
                       href={cta.href}
-                      className="flex items-center gap-3 border border-border bg-surface text-muted font-semibold text-xs tracking-widest uppercase px-8 py-4 hover:border-accent/30 hover:text-ink transition-all duration-200 rounded-full"
+                      className="flex items-center justify-center gap-3 border-2 border-border bg-surface text-ink font-semibold text-sm tracking-widest uppercase px-10 py-5 hover:border-accent/50 hover:text-accent transition-all duration-200 rounded-full"
                     >
                       {cta.label}
                     </Link>
