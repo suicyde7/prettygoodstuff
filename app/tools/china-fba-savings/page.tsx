@@ -4,29 +4,57 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { sendLead } from '@/lib/sendLead'
 
-type Complexity = 'simple' | 'standard' | 'full'
+type Complexity    = 'simple' | 'standard' | 'full'
 type PrepSituation = 'us_3pl' | 'self_prep' | 'no_prep' | 'already_china'
 
-// Costs reflect PGS published pricing at 500–1,999 unit tier (mid-volume)
 const COMPLEXITY: Record<Complexity, { cost: number; label: string; desc: string }> = {
-  simple:   { cost: 0.45, label: 'Standard',     desc: 'FNSKU label only' },
-  standard: { cost: 0.60, label: 'Premium',       desc: 'Poly bag + FNSKU label' },
-  full:     { cost: 0.78, label: 'Full Service',  desc: 'QC inspection + poly bag + label + carton prep' },
+  simple:   { cost: 0.45, label: 'Standard',    desc: 'FNSKU label only' },
+  standard: { cost: 0.60, label: 'Premium',      desc: 'Poly bag + FNSKU label' },
+  full:     { cost: 0.78, label: 'Full Service', desc: 'QC inspection + poly bag + label + carton prep' },
 }
 
 const PREP_OPTIONS: { value: PrepSituation; label: string; sub: string }[] = [
-  { value: 'us_3pl',        label: 'US 3PL / prep center',          sub: 'Paying a third-party warehouse in the US to prep' },
-  { value: 'self_prep',     label: 'Self-prepping in the US',        sub: 'Doing it in-house before sending to FBA' },
+  { value: 'us_3pl',        label: 'US 3PL / prep center',            sub: 'Paying a third-party warehouse in the US to prep' },
+  { value: 'self_prep',     label: 'Self-prepping in the US',          sub: 'Doing it in-house before sending to FBA' },
   { value: 'no_prep',       label: "I don't have a prep solution yet", sub: 'Still figuring out the logistics' },
-  { value: 'already_china', label: 'Already using a China service',  sub: 'Looking to compare or switch' },
+  { value: 'already_china', label: 'Already using a China service',    sub: 'Looking to compare or switch' },
 ]
 
 function fmt(n: number) {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
-function fmtUnit(n: number) {
-  return `$${n.toFixed(2)}`
+function fmtUnit(n: number) { return `$${n.toFixed(2)}` }
+
+// ── Gate card ──────────────────────────────────────────────────────────────────
+
+function GateCard({ teaser, onUnlock }: { teaser: React.ReactNode; onUnlock: (name: string, email: string) => void }) {
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
+  const isValid = /\S+@\S+\.\S+/.test(email)
+  return (
+    <div className="bg-surface border border-border rounded-lg p-8 flex flex-col items-center gap-6">
+      {teaser}
+      <div className="w-full border-t border-border pt-6 flex flex-col gap-4 max-w-sm mx-auto">
+        <div className="text-center">
+          <p className="font-display font-semibold text-lg text-ink uppercase mb-1">Unlock Your Full Breakdown</p>
+          <p className="text-muted text-xs leading-relaxed">Enter your email to see the full cost comparison and savings breakdown.</p>
+        </div>
+        <input type="text" placeholder="First name (optional)" value={name} onChange={e => setName(e.target.value)}
+          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+        <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
+          className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
+        <button onClick={() => isValid && onUnlock(name.trim(), email.trim())} disabled={!isValid}
+          className="group flex items-center justify-center gap-2 bg-accent text-white font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20">
+          See My Full Results
+          <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+        </button>
+        <p className="text-muted/40 text-xs text-center">No spam. One follow-up with personalised recommendations.</p>
+      </div>
+    </div>
+  )
 }
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function ChinaFBASavingsPage() {
   const [currentCost, setCurrentCost]     = useState('')
@@ -34,18 +62,13 @@ export default function ChinaFBASavingsPage() {
   const [shipments, setShipments]         = useState('')
   const [complexity, setComplexity]       = useState<Complexity>('standard')
   const [prepSituation, setPrepSituation] = useState<PrepSituation | ''>('')
-  const [name, setName]                   = useState('')
-  const [email, setEmail]                 = useState('')
   const [results, setResults]             = useState<null | {
-    savingsPerUnit: number
-    savingsPerShipment: number
-    annualSavings: number
-    threeYearSavings: number
-    currentAnnual: number
-    chinaAnnual: number
-    chinaCost: number
-    noSavings: boolean
+    savingsPerUnit: number; savingsPerShipment: number
+    annualSavings: number; threeYearSavings: number
+    currentAnnual: number; chinaAnnual: number
+    chinaCost: number; noSavings: boolean
   }>(null)
+  const [unlocked, setUnlocked] = useState(false)
 
   function calculate() {
     const c = parseFloat(currentCost)
@@ -53,40 +76,34 @@ export default function ChinaFBASavingsPage() {
     const s = parseInt(shipments)
     const chinaCost = COMPLEXITY[complexity].cost
     if (!c || !u || !s || c <= 0 || u <= 0 || s <= 0) return
-
-    const savingsPerUnit      = c - chinaCost
-    const savingsPerShipment  = savingsPerUnit * u
-    const annualSavings       = savingsPerShipment * s
-    const threeYearSavings    = annualSavings * 3
-    const currentAnnual       = c * u * s
-    const chinaAnnual         = chinaCost * u * s
-
-    const res = {
-      savingsPerUnit,
-      savingsPerShipment,
-      annualSavings,
-      threeYearSavings,
-      currentAnnual,
-      chinaAnnual,
-      chinaCost,
-      noSavings: savingsPerUnit <= 0,
-    }
-
-    setResults(res)
-
-    sendLead({
-      tool:          'China FBA Savings',
-      name:          name.trim(),
-      email:         email.trim(),
-      prepSituation: prepSituation || '',
-      currentCostPerUnit: c,
-      unitsPerShipment:   u,
-      shipmentsPerYear:   s,
-      complexityTier:     COMPLEXITY[complexity].label,
-      annualSavings:      Math.round(annualSavings),
-      unitsPerYear:       u * s,
-      noSavings:          savingsPerUnit <= 0,
+    const savingsPerUnit     = c - chinaCost
+    const savingsPerShipment = savingsPerUnit * u
+    const annualSavings      = savingsPerShipment * s
+    setResults({
+      savingsPerUnit, savingsPerShipment, annualSavings,
+      threeYearSavings: annualSavings * 3,
+      currentAnnual: c * u * s,
+      chinaAnnual: chinaCost * u * s,
+      chinaCost, noSavings: savingsPerUnit <= 0,
     })
+    setUnlocked(false)
+  }
+
+  function unlock(name: string, email: string) {
+    if (!results) return
+    sendLead({
+      tool:               'China FBA Savings',
+      name, email,
+      prepSituation:      prepSituation || '',
+      currentCostPerUnit: parseFloat(currentCost),
+      unitsPerShipment:   parseInt(units),
+      shipmentsPerYear:   parseInt(shipments),
+      complexityTier:     COMPLEXITY[complexity].label,
+      annualSavings:      Math.round(results.annualSavings),
+      unitsPerYear:       parseInt(units) * parseInt(shipments),
+      noSavings:          results.noSavings,
+    })
+    setUnlocked(true)
   }
 
   const isValid = currentCost && units && shipments &&
@@ -100,11 +117,8 @@ export default function ChinaFBASavingsPage() {
         <Link href="/">
           <Image src="/logo.png" alt="Pretty Good Stuff" width={800} height={150} className="h-[32px] w-auto object-contain" />
         </Link>
-        <Link href="/#services"
-          className="flex items-center gap-2 text-muted hover:text-ink transition-colors duration-200 text-xs font-semibold tracking-widest uppercase">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+        <Link href="/#services" className="flex items-center gap-2 text-muted hover:text-ink transition-colors duration-200 text-xs font-semibold tracking-widest uppercase">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           Back
         </Link>
       </div>
@@ -118,8 +132,7 @@ export default function ChinaFBASavingsPage() {
               <span className="text-[10px] font-bold tracking-widest uppercase">Free Tool · China FBA Prep</span>
             </div>
             <h1 className="font-display font-bold text-6xl md:text-7xl text-ink uppercase leading-none mb-4">
-              How Much<br />
-              <span className="gradient-text-accent">Could You Save?</span>
+              How Much<br /><span className="gradient-text-accent">Could You Save?</span>
             </h1>
             <p className="text-muted text-sm leading-relaxed max-w-md">
               Most FBA sellers using a US prep center are overpaying by $0.50–$1.50 per unit.
@@ -133,122 +146,68 @@ export default function ChinaFBASavingsPage() {
 
               {/* Current prep cost */}
               <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                  Current prep cost per unit
-                </label>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Current prep cost per unit</label>
                 <p className="text-muted text-xs mb-3">What your US 3PL or prep center charges per unit</p>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted text-sm font-medium">$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="2.00"
-                    value={currentCost}
-                    onChange={e => { setCurrentCost(e.target.value); setResults(null) }}
-                    className="w-full bg-surfaceAlt border border-border rounded-lg pl-8 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-                  />
+                  <input type="number" min="0" step="0.01" placeholder="2.00"
+                    value={currentCost} onChange={e => { setCurrentCost(e.target.value); setResults(null); setUnlocked(false) }}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg pl-8 pr-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
               </div>
 
-              {/* Units + shipments — side by side */}
+              {/* Units + shipments */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                    Units per shipment
-                  </label>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Units per shipment</label>
                   <p className="text-muted text-xs mb-3">Typical FBA batch size</p>
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="500"
-                    value={units}
-                    onChange={e => { setUnits(e.target.value); setResults(null) }}
-                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-                  />
+                  <input type="number" min="1" step="1" placeholder="500"
+                    value={units} onChange={e => { setUnits(e.target.value); setResults(null); setUnlocked(false) }}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                    Shipments per year
-                  </label>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Shipments per year</label>
                   <p className="text-muted text-xs mb-3">How often you restock</p>
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="4"
-                    value={shipments}
-                    onChange={e => { setShipments(e.target.value); setResults(null) }}
-                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-                  />
+                  <input type="number" min="1" step="1" placeholder="4"
+                    value={shipments} onChange={e => { setShipments(e.target.value); setResults(null); setUnlocked(false) }}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors" />
                 </div>
               </div>
 
               {/* Complexity */}
               <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                  Prep complexity
-                </label>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Prep complexity</label>
                 <p className="text-muted text-xs mb-3">Rates shown at 500–1,999 units/shipment (mid-volume tier). <a href="/pricing/china-fba-prep" className="underline underline-offset-2 hover:text-ink transition-colors">View full pricing →</a></p>
                 <div className="flex flex-col gap-2">
                   {(Object.entries(COMPLEXITY) as [Complexity, typeof COMPLEXITY[Complexity]][]).map(([key, { label, desc }]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => { setComplexity(key); setResults(null) }}
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all duration-200 ${
-                        complexity === key
-                          ? 'border-accent bg-accentLight'
-                          : 'border-border bg-surfaceAlt hover:border-accent/30'
-                      }`}
-                    >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        complexity === key ? 'border-accent bg-accent' : 'border-muted/30'
-                      }`}>
+                    <button key={key} type="button" onClick={() => { setComplexity(key); setResults(null); setUnlocked(false) }}
+                      className={`flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all duration-200 ${complexity === key ? 'border-accent bg-accentLight' : 'border-border bg-surfaceAlt hover:border-accent/30'}`}>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${complexity === key ? 'border-accent bg-accent' : 'border-muted/30'}`}>
                         {complexity === key && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
                       <div>
-                        <p className={`text-xs font-bold tracking-widest uppercase ${complexity === key ? 'text-accent' : 'text-ink'}`}>
-                          {label}
-                        </p>
+                        <p className={`text-xs font-bold tracking-widest uppercase ${complexity === key ? 'text-accent' : 'text-ink'}`}>{label}</p>
                         <p className="text-muted text-xs mt-0.5">{desc}</p>
                       </div>
-                      <span className={`ml-auto text-xs font-semibold ${complexity === key ? 'text-accent' : 'text-muted/50'}`}>
-                        ~${COMPLEXITY[key].cost.toFixed(2)}/unit
-                      </span>
+                      <span className={`ml-auto text-xs font-semibold ${complexity === key ? 'text-accent' : 'text-muted/50'}`}>~${COMPLEXITY[key].cost.toFixed(2)}/unit</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Current prep situation */}
+              {/* Qualifying question — prep situation */}
               <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                  Where are you currently prepping?
-                </label>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">Where are you currently prepping?</label>
                 <p className="text-muted text-xs mb-3">Helps us give you the most relevant comparison</p>
                 <div className="flex flex-col gap-2">
                   {PREP_OPTIONS.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => { setPrepSituation(opt.value); setResults(null) }}
-                      className={`flex items-center gap-4 p-3.5 rounded-lg border-2 text-left transition-all duration-150 ${
-                        prepSituation === opt.value
-                          ? 'border-accent bg-accentLight'
-                          : 'border-border bg-surfaceAlt hover:border-accent/30'
-                      }`}
-                    >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                        prepSituation === opt.value ? 'border-accent bg-accent' : 'border-muted/30'
-                      }`}>
+                    <button key={opt.value} type="button" onClick={() => { setPrepSituation(opt.value); setResults(null); setUnlocked(false) }}
+                      className={`flex items-center gap-4 p-3.5 rounded-lg border-2 text-left transition-all duration-150 ${prepSituation === opt.value ? 'border-accent bg-accentLight' : 'border-border bg-surfaceAlt hover:border-accent/30'}`}>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${prepSituation === opt.value ? 'border-accent bg-accent' : 'border-muted/30'}`}>
                         {prepSituation === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
                       <div>
-                        <p className={`text-xs font-bold tracking-widest uppercase ${prepSituation === opt.value ? 'text-accent' : 'text-ink'}`}>
-                          {opt.label}
-                        </p>
+                        <p className={`text-xs font-bold tracking-widest uppercase ${prepSituation === opt.value ? 'text-accent' : 'text-ink'}`}>{opt.label}</p>
                         <p className="text-muted text-xs mt-0.5">{opt.sub}</p>
                       </div>
                     </button>
@@ -256,44 +215,9 @@ export default function ChinaFBASavingsPage() {
                 </div>
               </div>
 
-              {/* Contact */}
-              <div className="border-t border-border pt-2">
-                <p className="text-xs font-bold tracking-widest uppercase text-ink mb-1">Your details</p>
-                <p className="text-muted text-xs mb-5">So we can reach out before your call with a personalised cost breakdown.</p>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                      Name <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="First name"
-                      value={name}
-                      onChange={e => setName(e.target.value)}
-                      className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
-                      Email <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="you@yourbrand.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Calculate button */}
-              <button
-                onClick={calculate}
-                disabled={!isValid}
-                className="group flex items-center justify-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-8 py-5 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-accent/20"
-              >
+              {/* Calculate */}
+              <button onClick={calculate} disabled={!isValid}
+                className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-accent/30 ring-2 ring-accent/20">
                 Calculate My Savings
                 <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
               </button>
@@ -301,41 +225,53 @@ export default function ChinaFBASavingsPage() {
             </div>
           </div>
 
-          {/* Results */}
-          {results && (
+          {/* Gate */}
+          {results && !unlocked && (
+            <GateCard
+              onUnlock={unlock}
+              teaser={
+                results.noSavings ? (
+                  <div className="text-center w-full">
+                    <p className="font-display font-bold text-2xl text-ink uppercase mb-2">You're Already Efficient</p>
+                    <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">Your current prep cost is at or below our rates. Unlock to learn about QC inspection services that protect your account.</p>
+                  </div>
+                ) : (
+                  <div className="text-center w-full">
+                    <p className="text-muted text-xs tracking-widest uppercase mb-3">Estimated Annual Savings</p>
+                    <p className="font-display font-bold text-6xl gradient-text-accent leading-none mb-1">{fmt(results.annualSavings)}</p>
+                    <p className="text-muted text-sm">{fmt(results.threeYearSavings)} over 3 years</p>
+                  </div>
+                )
+              }
+            />
+          )}
+
+          {/* Full results */}
+          {results && unlocked && (
             <div className="flex flex-col gap-4 animate-in fade-in duration-500">
 
               {results.noSavings ? (
-                /* Already efficient */
                 <div className="bg-surface border border-border rounded-lg p-8 text-center">
                   <p className="font-display font-bold text-3xl text-ink uppercase mb-3">You're Already Efficient</p>
                   <p className="text-muted text-sm leading-relaxed max-w-sm mx-auto">
-                    Your current prep cost per unit ({fmtUnit(parseFloat(currentCost))}) is at or below what
-                    China prep typically costs for {COMPLEXITY[complexity].label.toLowerCase()} service.
+                    Your current prep cost ({fmtUnit(parseFloat(currentCost))}) is at or below what China prep typically costs for {COMPLEXITY[complexity].label.toLowerCase()} service.
                     {complexity === 'full'
                       ? " That said, our Full Service includes pre-shipment QC inspection — which most US centers don't offer at any price."
                       : " If defect risk is a concern, our Full Service adds pre-shipment QC inspection for a small premium."}
                   </p>
-                  <a href="https://calendly.com/welcome-prettygoodstuff/30min"
-                    target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-6 bg-accent text-white text-xs font-semibold tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-colors shadow-lg shadow-accent/20">
+                  <a href="https://calendly.com/welcome-prettygoodstuff/30min" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-6 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-colors shadow-xl shadow-accent/30 ring-2 ring-accent/20">
                     Talk to Us About QC →
                   </a>
                 </div>
               ) : (
                 <>
-                  {/* Hero savings number */}
                   <div className="bg-surface border border-border rounded-lg p-8 text-center">
                     <p className="text-muted text-xs tracking-widest uppercase mb-3">Estimated Annual Savings</p>
-                    <p className="font-display font-bold text-7xl md:text-8xl gradient-text-accent leading-none mb-2">
-                      {fmt(results.annualSavings)}
-                    </p>
-                    <p className="text-muted text-sm">
-                      {fmt(results.threeYearSavings)} over 3 years
-                    </p>
+                    <p className="font-display font-bold text-7xl md:text-8xl gradient-text-accent leading-none mb-2">{fmt(results.annualSavings)}</p>
+                    <p className="text-muted text-sm">{fmt(results.threeYearSavings)} over 3 years</p>
                   </div>
 
-                  {/* Breakdown table */}
                   <div className="bg-surface border border-border rounded-lg overflow-hidden">
                     <div className="grid grid-cols-3 bg-surfaceAlt border-b border-border">
                       <div className="px-6 py-3" />
@@ -347,62 +283,33 @@ export default function ChinaFBASavingsPage() {
                       </div>
                     </div>
                     {[
-                      {
-                        label: 'Per unit',
-                        current: fmtUnit(parseFloat(currentCost)),
-                        china: fmtUnit(results.chinaCost),
-                      },
-                      {
-                        label: `Per shipment (${parseInt(units).toLocaleString()} units)`,
-                        current: fmt(parseFloat(currentCost) * parseInt(units)),
-                        china: fmt(results.chinaCost * parseInt(units)),
-                      },
-                      {
-                        label: `Per year (${parseInt(shipments)} shipments)`,
-                        current: fmt(results.currentAnnual),
-                        china: fmt(results.chinaAnnual),
-                      },
+                      { label: 'Per unit', current: fmtUnit(parseFloat(currentCost)), china: fmtUnit(results.chinaCost) },
+                      { label: `Per shipment (${parseInt(units).toLocaleString()} units)`, current: fmt(parseFloat(currentCost) * parseInt(units)), china: fmt(results.chinaCost * parseInt(units)) },
+                      { label: `Per year (${parseInt(shipments)} shipments)`, current: fmt(results.currentAnnual), china: fmt(results.chinaAnnual) },
                     ].map(({ label, current, china }, i) => (
                       <div key={i} className={`grid grid-cols-3 ${i < 2 ? 'border-b border-border' : ''}`}>
-                        <div className="px-6 py-4">
-                          <p className="text-xs text-muted leading-snug">{label}</p>
-                        </div>
-                        <div className="px-6 py-4 text-center border-l border-border">
-                          <p className="text-sm font-semibold text-ink">{current}</p>
-                        </div>
-                        <div className="px-6 py-4 text-center border-l border-border bg-accentLight/40">
-                          <p className="text-sm font-semibold text-accent">{china}</p>
-                        </div>
+                        <div className="px-6 py-4"><p className="text-xs text-muted leading-snug">{label}</p></div>
+                        <div className="px-6 py-4 text-center border-l border-border"><p className="text-sm font-semibold text-ink">{current}</p></div>
+                        <div className="px-6 py-4 text-center border-l border-border bg-accentLight/40"><p className="text-sm font-semibold text-accent">{china}</p></div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Savings highlight */}
                   <div className="bg-accentLight border border-accent/20 rounded-lg px-6 py-5 flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs font-bold tracking-widest uppercase text-accent mb-1">Your savings</p>
-                      <p className="text-muted text-xs leading-relaxed">
-                        {fmtUnit(results.savingsPerUnit)}/unit · {fmt(results.savingsPerShipment)}/shipment · <span className="font-semibold text-accent">{fmt(results.annualSavings)}/year</span>
-                      </p>
+                      <p className="text-muted text-xs">{fmtUnit(results.savingsPerUnit)}/unit · {fmt(results.savingsPerShipment)}/shipment · <span className="font-semibold text-accent">{fmt(results.annualSavings)}/year</span></p>
                     </div>
                     <p className="font-display font-bold text-3xl text-accent flex-shrink-0">{fmt(results.annualSavings)}</p>
                   </div>
 
-                  {/* CTA */}
                   <div className="bg-surface border border-border rounded-lg p-8 text-center">
-                    <p className="font-display font-semibold text-xl text-ink uppercase mb-2">
-                      Ready to start saving?
-                    </p>
+                    <p className="font-display font-semibold text-xl text-ink uppercase mb-2">Ready to start saving?</p>
                     <p className="text-muted text-sm leading-relaxed max-w-sm mx-auto mb-6">
-                      In a free 30-minute call we'll run the exact numbers for your SKUs —
-                      including freight, duties, and landed cost — before you commit to anything.
+                      In a free 30-minute call we'll run the exact numbers for your SKUs — including freight, duties, and landed cost — before you commit to anything.
                     </p>
-                    <a
-                      href="https://calendly.com/welcome-prettygoodstuff/30min"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-8 py-4 rounded-full hover:bg-accentDark transition-colors shadow-lg shadow-accent/20"
-                    >
+                    <a href="https://calendly.com/welcome-prettygoodstuff/30min" target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 rounded-full hover:bg-accentDark transition-colors shadow-xl shadow-accent/30 ring-2 ring-accent/20">
                       Book a Free Sourcing Call →
                     </a>
                     <p className="text-muted/40 text-xs mt-4">No commitment. We'll run the numbers together.</p>
@@ -416,7 +323,6 @@ export default function ChinaFBASavingsPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="px-8 py-8 border-t border-border">
         <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted/40 text-xs">© 2026 Pretty Good Stuff · ShenCo LLC</p>
