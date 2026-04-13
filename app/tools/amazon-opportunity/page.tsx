@@ -44,6 +44,10 @@ interface Inputs {
   photos:         YesNo
   supplier:       YesNo
   differentiated: Differentiated
+  hasWebsite:     YesNo
+  websiteUrl:     string
+  name:           string
+  email:          string
 }
 
 interface Results {
@@ -56,6 +60,9 @@ interface Results {
   gaps:             { title: string; body: string; blocking: boolean }[]
   timeToLive:       string
   verdict:          string
+  name:             string
+  email:            string
+  websiteUrl:       string
 }
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
@@ -95,11 +102,12 @@ function computeResults(inp: Inputs): Results {
   let ready = 0
 
   if (inp.supplier === 'yes') ready += 30
-  if (inp.photos === 'yes') ready += 25
-  if (inp.trademark === 'yes') ready += 25
-  else if (inp.trademark === 'in_progress') ready += 12
-  if (inp.differentiated === 'yes') ready += 20
-  else if (inp.differentiated === 'somewhat') ready += 10
+  if (inp.photos === 'yes') ready += 20
+  if (inp.trademark === 'yes') ready += 20
+  else if (inp.trademark === 'in_progress') ready += 10
+  if (inp.differentiated === 'yes') ready += 15
+  else if (inp.differentiated === 'somewhat') ready += 7
+  if (inp.hasWebsite === 'yes') ready += 15  // existing brand infrastructure, proven demand
 
   ready = Math.min(ready, 100)
 
@@ -160,6 +168,14 @@ function computeResults(inp: Inputs): Results {
     })
   }
 
+  if (inp.hasWebsite === 'no') {
+    gaps.push({
+      title: 'No existing website or DTC presence',
+      body: 'A DTC site signals proven demand, gives you brand assets ready for Amazon, and builds the off-Amazon traffic that accelerates organic rank. Launching on Amazon without one is possible but you\'re giving up a meaningful head start.',
+      blocking: false,
+    })
+  }
+
   // Sort blocking first
   gaps.sort((a, b) => (b.blocking ? 1 : 0) - (a.blocking ? 1 : 0))
 
@@ -208,6 +224,9 @@ function computeResults(inp: Inputs): Results {
     gaps:             gaps.slice(0, 4),
     timeToLive,
     verdict,
+    name:       inp.name.trim(),
+    email:      inp.email.trim(),
+    websiteUrl: inp.websiteUrl.trim(),
   }
 }
 
@@ -283,6 +302,10 @@ const defaultInputs: Inputs = {
   photos:         'no',
   supplier:       'no',
   differentiated: 'somewhat',
+  hasWebsite:     'no',
+  websiteUrl:     '',
+  name:           '',
+  email:          '',
 }
 
 export default function AmazonOpportunityPage() {
@@ -432,6 +455,67 @@ export default function AmazonOpportunityPage() {
               ]}
             />
 
+            {/* Existing website */}
+            <RadioGroup
+              label="Do you have an existing website or DTC store?"
+              sublabel="A live site where customers can already find and buy your product"
+              value={inp.hasWebsite}
+              onChange={v => set('hasWebsite', v)}
+              options={[
+                { value: 'yes', label: 'Yes', sub: 'Live website or Shopify/DTC store with real customers' },
+                { value: 'no',  label: 'No',  sub: "Selling only on Amazon or haven't launched yet" },
+              ]}
+            />
+
+            {/* Website URL — shown when yes */}
+            {inp.hasWebsite === 'yes' && (
+              <div>
+                <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                  Website URL <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
+                </label>
+                <p className="text-muted text-xs mb-3">We'll review it before your strategy call so we come prepared</p>
+                <input
+                  type="url"
+                  placeholder="https://yourbrand.com"
+                  value={inp.websiteUrl}
+                  onChange={e => set('websiteUrl', e.target.value)}
+                  className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+                />
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="border-t border-border pt-2">
+              <p className="text-xs font-bold tracking-widest uppercase text-ink mb-1">Your details</p>
+              <p className="text-muted text-xs mb-5">So we can send your results and reach out before the call.</p>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                    Name <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="First name"
+                    value={inp.name}
+                    onChange={e => set('name', e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold tracking-widest uppercase text-ink mb-1">
+                    Email <span className="text-muted/40 normal-case font-normal tracking-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="you@yourbrand.com"
+                    value={inp.email}
+                    onChange={e => set('email', e.target.value)}
+                    className="w-full bg-surfaceAlt border border-border rounded-lg px-4 py-3 text-sm text-ink placeholder:text-muted/40 focus:outline-none focus:border-accent/50 transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Submit */}
             <button
               onClick={calculate}
@@ -541,6 +625,34 @@ export default function AmazonOpportunityPage() {
                   <p className="text-xs text-green-700 leading-relaxed">
                     Your inputs show strong market alignment and launch readiness. The next step is validating at the ASIN level — keyword research, competitor review count, and pricing analysis.
                   </p>
+                </div>
+              )}
+
+              {/* Contact summary — shown if name or email was provided */}
+              {(results.name || results.email || results.websiteUrl) && (
+                <div className="bg-surfaceAlt border border-border rounded-lg px-6 py-4">
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-muted mb-3">Your details on file</p>
+                  <div className="flex flex-col gap-1.5">
+                    {results.name && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted/60 w-16">Name</span>
+                        <span className="text-xs text-ink">{results.name}</span>
+                      </div>
+                    )}
+                    {results.email && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted/60 w-16">Email</span>
+                        <span className="text-xs text-ink">{results.email}</span>
+                      </div>
+                    )}
+                    {results.websiteUrl && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted/60 w-16">Website</span>
+                        <span className="text-xs text-accent">{results.websiteUrl}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-muted/40 text-xs mt-3">We'll review your site before the call so we come prepared.</p>
                 </div>
               )}
 
