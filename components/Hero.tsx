@@ -1,8 +1,71 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import Link from 'next/link'
+
+const INTERVAL_MS = 5000
+
+const TOOLS = [
+  {
+    num: '01',
+    label: 'Listing Quality Grader',
+    headline: 'Is Your Listing\nLeaking Conversions?',
+    prompt: 'Paste your title and bullet points. Get a full audit with a letter grade and a prioritized fix list — in 60 seconds.',
+    href: '/tools/listing-grader',
+    cta: 'Grade My Listing',
+  },
+  {
+    num: '02',
+    label: 'Amazon Opportunity Score',
+    headline: 'Is Your Product\nReady to Launch?',
+    prompt: 'Answer 6 questions about your product. Get a market opportunity score and an honest readiness check before you invest.',
+    href: '/tools/amazon-opportunity',
+    cta: 'Check My Score',
+  },
+  {
+    num: '03',
+    label: 'China FBA Savings',
+    headline: 'How Much Are You\nOverpaying for Prep?',
+    prompt: 'Enter your current prep cost and shipment volume. See exactly what switching to China prep saves you per year.',
+    href: '/tools/china-fba-savings',
+    cta: 'Calculate Savings',
+  },
+]
 
 export default function Hero() {
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded]       = useState(false)
+  const [active, setActive]       = useState(0)
+  const [progress, setProgress]   = useState(0)
+  const [paused, setPaused]       = useState(false)
+  const intervalRef               = useRef<ReturnType<typeof setInterval> | null>(null)
+  const progressRef               = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const goTo = useCallback((idx: number) => {
+    setActive(idx)
+    setProgress(0)
+  }, [])
+
+  const next = useCallback(() => {
+    setActive(prev => (prev + 1) % TOOLS.length)
+    setProgress(0)
+  }, [])
+
+  // Auto-advance
+  useEffect(() => {
+    if (paused) return
+    intervalRef.current = setInterval(next, INTERVAL_MS)
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+  }, [paused, next])
+
+  // Progress bar tick
+  useEffect(() => {
+    if (paused) { setProgress(0); return }
+    const tick = 50
+    progressRef.current = setInterval(() => {
+      setProgress(prev => Math.min(prev + (tick / INTERVAL_MS) * 100, 100))
+    }, tick)
+    return () => { if (progressRef.current) clearInterval(progressRef.current) }
+  }, [paused, active])
+
   useEffect(() => { setLoaded(true) }, [])
 
   return (
@@ -45,6 +108,94 @@ export default function Hero() {
               </a>
             </div>
           </div>
+
+          {/* ── Tools Carousel ── */}
+          <div className="mt-16">
+
+            {/* Section label */}
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-[10px] text-accent font-light tracking-wider">✦</span>
+              <span className="w-6 h-px bg-accent/40" />
+              <span className="text-muted text-xs tracking-[0.4em] uppercase">Free Tools</span>
+            </div>
+
+            {/* Carousel track */}
+            <div
+              className="relative overflow-hidden rounded-lg"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+            >
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${active * 100}%)` }}
+              >
+                {TOOLS.map((tool, i) => (
+                  <div
+                    key={i}
+                    className="w-full flex-shrink-0 bg-surface border border-border rounded-lg px-8 py-8 flex flex-col md:flex-row md:items-center gap-6 md:gap-12"
+                  >
+                    {/* Left: number + label + headline */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-[10px] text-muted/40 font-light tracking-widest">{tool.num}</span>
+                        <span className="w-4 h-px bg-border" />
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-accent/70 bg-accentLight border border-accent/15 px-3 py-1 rounded-full">
+                          {tool.label}
+                        </span>
+                      </div>
+                      <h2 className="font-display font-bold text-2xl md:text-3xl text-ink uppercase leading-tight mb-3 whitespace-pre-line">
+                        {tool.headline}
+                      </h2>
+                      <p className="text-muted text-sm leading-relaxed max-w-sm">
+                        {tool.prompt}
+                      </p>
+                    </div>
+
+                    {/* Right: CTA */}
+                    <div className="flex-shrink-0">
+                      <Link
+                        href={tool.href}
+                        className="group inline-flex items-center gap-3 bg-accent text-white font-semibold text-xs tracking-widest uppercase px-7 py-4 rounded-full hover:bg-accentDark transition-all duration-200 shadow-lg shadow-accent/20 whitespace-nowrap"
+                      >
+                        {tool.cta}
+                        <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Progress bar */}
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-border">
+                <div
+                  className="h-full bg-accent transition-none"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Dots */}
+            <div className="flex items-center gap-3 mt-4">
+              {TOOLS.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  className={`transition-all duration-300 rounded-full ${
+                    i === active
+                      ? 'w-6 h-1.5 bg-accent'
+                      : 'w-1.5 h-1.5 bg-border hover:bg-muted/30'
+                  }`}
+                  aria-label={`Go to ${TOOLS[i].label}`}
+                />
+              ))}
+              <span className="ml-auto text-[10px] text-muted/40 tracking-widest uppercase">
+                {active + 1} / {TOOLS.length}
+              </span>
+            </div>
+
+          </div>
+          {/* ── End Tools Carousel ── */}
+
         </div>
       </div>
     </section>
