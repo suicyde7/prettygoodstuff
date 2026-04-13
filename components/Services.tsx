@@ -45,7 +45,7 @@ const services = [
   },
   {
     num: '03', icon: '⬡',
-    name: 'China FBA Prep & Quality Control',
+    name: 'China FBA Prep & QC',
     for: 'For sellers sourcing from China',
     pain: 'A defective batch sent to Amazon can destroy your store overnight.',
     body: 'If a defective batch reaches Amazon\'s warehouse, the damage is immediate — negative reviews, A-to-Z claims, account suspension. We inspect, prep, and ship from China, catching problems before they ever leave the source.',
@@ -121,7 +121,7 @@ export default function Services() {
               <span className="w-6 h-px bg-accent/40" />
               <span className="text-muted text-xs tracking-[0.4em] uppercase">What We Do</span>
             </div>
-            <h2 className="font-display font-bold text-6xl md:text-7xl text-ink uppercase leading-none">PGS Helm Services</h2>
+            <h2 className="font-display font-bold text-6xl md:text-7xl text-ink uppercase leading-none">Services</h2>
           </div>
           <p className="hidden md:block text-muted text-sm max-w-xs text-right leading-relaxed">
             We fix the exact problems that are costing you revenue right now.
@@ -155,8 +155,19 @@ export default function Services() {
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between mb-5">
-                      <div className={`text-xl p-2.5 border rounded-md ${s.icon}`}>{icon}</div>
-                      <span className="text-muted/30 text-xs font-light">{num}</span>
+                      <div className="flex items-center gap-3">
+                        <div className={`text-xl p-2.5 border rounded-md flex-shrink-0 ${s.icon}`}>{icon}</div>
+                        {toolHref && toolLabel && (
+                          <a
+                            href={toolHref}
+                            onClick={e => e.stopPropagation()}
+                            className={`inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full border-2 transition-all duration-200 hover:opacity-80 ${s.for}`}
+                          >
+                            {toolLabel}
+                          </a>
+                        )}
+                      </div>
+                      <span className="text-muted/30 text-xs font-light flex-shrink-0">{num}</span>
                     </div>
 
                     {/* For badge */}
@@ -185,17 +196,8 @@ export default function Services() {
                       })}
                     </div>
 
-                    {/* Tool link + flip hint */}
-                    <div className="flex items-center justify-between mt-3">
-                      {toolHref && toolLabel ? (
-                        <a
-                          href={toolHref}
-                          onClick={e => e.stopPropagation()}
-                          className={`text-[10px] font-semibold tracking-widest uppercase underline underline-offset-2 ${s.hint} hover:opacity-80 transition-opacity`}
-                        >
-                          {toolLabel}
-                        </a>
-                      ) : <span />}
+                    {/* Flip hint */}
+                    <div className="flex items-center justify-end mt-3">
                       <p className={`text-[10px] tracking-widest uppercase ${s.hint}`}>
                         See full roadmap →
                       </p>
