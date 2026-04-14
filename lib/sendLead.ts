@@ -7,9 +7,10 @@ const SHEET_URL = process.env.NEXT_PUBLIC_LEADS_SHEET_URL ?? ''
 export function sendLead(data: Record<string, unknown>): void {
   if (!SHEET_URL) return
   fetch(SHEET_URL, {
-    method:  'POST',
-    mode:    'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(data),
+    method: 'POST',
+    mode:   'no-cors',
+    // no Content-Type header — 'application/json' is blocked in no-cors mode.
+    // Body is still JSON; Apps Script reads it from e.postData.contents.
+    body:   JSON.stringify(data),
   }).catch(() => {})
 }
