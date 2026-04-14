@@ -91,19 +91,7 @@ export default function Platform() {
             const s = styles[accent]
             return (
               <div key={name}
-                className={`bg-surface border border-border rounded-lg p-8 flex flex-col gap-6 ring-2 ring-transparent transition-shadow duration-300 ${s.ring} hover:shadow-xl`}
-                onMouseMove={(e) => {
-                  const r = e.currentTarget.getBoundingClientRect()
-                  const x = (e.clientY - r.top) / r.height - 0.5
-                  const y = (e.clientX - r.left) / r.width - 0.5
-                  e.currentTarget.style.transform = `perspective(700px) rotateX(${-x * 7}deg) rotateY(${y * 7}deg) translateZ(6px)`
-                  e.currentTarget.style.transition = 'transform 0.1s ease-out'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) translateZ(0px)'
-                  e.currentTarget.style.transition = 'transform 0.6s ease-out'
-                }}
-              >
+                className={`bg-surface border border-border rounded-lg p-8 flex flex-col gap-6 ring-2 ring-transparent transition-all duration-300 ${s.ring} hover:shadow-xl`}>
 
                 {/* Header */}
                 <div className="flex items-start justify-between">

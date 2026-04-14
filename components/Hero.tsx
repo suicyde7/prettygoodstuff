@@ -114,24 +114,9 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-surfaceAlt">
-      {/* Warm glow shapes — animated */}
-      <div
-        className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full"
-        style={{ animation: 'blobFloat 14s ease-in-out infinite' }}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none"
-        style={{ animation: 'blobFloat2 18s ease-in-out infinite' }}
-      />
-
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.35]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(204,120,92,0.22) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      />
+      {/* Warm glow shapes */}
+      <div className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none" />
 
       {/* Slides */}
       {SLIDES.map((slide, i) => (
@@ -149,26 +134,13 @@ export default function Hero() {
               <span className="text-xs font-semibold tracking-widest uppercase">{slide.badge.text}</span>
             </div>
 
-            {/* Headline — line-by-line entrance on active slide */}
+            {/* Headline */}
             <h1 className="font-display font-bold text-[11vw] md:text-[8vw] leading-[0.9] tracking-tightest uppercase mb-8">
-              {i === active
-                ? slide.headline.map((line, li) => (
-                    <div
-                      key={li}
-                      style={{
-                        animation: 'lineFadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) both',
-                        animationDelay: `${li * 0.18}s`,
-                      }}
-                    >
-                      <span className={line.className}>{line.text}</span>
-                    </div>
-                  ))
-                : slide.headline.map((line, li) => (
-                    <span key={li} className={line.className}>
-                      {line.text}{li < slide.headline.length - 1 && <br />}
-                    </span>
-                  ))
-              }
+              {slide.headline.map((line, li) => (
+                <span key={li} className={line.className}>
+                  {line.text}{li < slide.headline.length - 1 && <br />}
+                </span>
+              ))}
             </h1>
 
             {/* Bottom row */}
@@ -179,17 +151,16 @@ export default function Hero() {
               <div className="flex flex-col sm:flex-row gap-3">
                 {slide.ctas.map((cta, ci) =>
                   cta.primary ? (
-                    <div key={ci} className="gradient-border shadow-xl shadow-accent/30">
-                      <Link
-                        href={cta.href}
-                        target={cta.href.startsWith('http') ? '_blank' : undefined}
-                        rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full"
-                      >
-                        {cta.label}
-                        <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
-                      </Link>
-                    </div>
+                    <Link
+                      key={ci}
+                      href={cta.href}
+                      target={cta.href.startsWith('http') ? '_blank' : undefined}
+                      rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full shadow-xl shadow-accent/30 ring-2 ring-accent/20"
+                    >
+                      {cta.label}
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                    </Link>
                   ) : (
                     <Link
                       key={ci}
