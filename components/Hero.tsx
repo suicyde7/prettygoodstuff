@@ -114,9 +114,15 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-surfaceAlt">
-      {/* Warm glow shapes */}
-      <div className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none" />
+      {/* Warm glow shapes — animated */}
+      <div
+        className="absolute top-0 right-0 w-[700px] h-[600px] bg-gradient-to-bl from-accentLight via-surfaceAlt to-transparent opacity-90 pointer-events-none rounded-bl-full"
+        style={{ animation: 'blobFloat 14s ease-in-out infinite' }}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-[500px] h-[400px] bg-gradient-to-tr from-surfaceAlt/60 to-transparent pointer-events-none"
+        style={{ animation: 'blobFloat2 18s ease-in-out infinite' }}
+      />
 
       {/* Dot grid */}
       <div
@@ -173,16 +179,17 @@ export default function Hero() {
               <div className="flex flex-col sm:flex-row gap-3">
                 {slide.ctas.map((cta, ci) =>
                   cta.primary ? (
-                    <Link
-                      key={ci}
-                      href={cta.href}
-                      target={cta.href.startsWith('http') ? '_blank' : undefined}
-                      rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      className="btn-shimmer group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full shadow-xl shadow-accent/30 ring-2 ring-accent/20"
-                    >
-                      {cta.label}
-                      <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
-                    </Link>
+                    <div key={ci} className="gradient-border shadow-xl shadow-accent/30">
+                      <Link
+                        href={cta.href}
+                        target={cta.href.startsWith('http') ? '_blank' : undefined}
+                        rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="group flex items-center justify-center gap-3 bg-accent text-white font-bold text-sm tracking-widest uppercase px-10 py-5 hover:bg-accentDark transition-all duration-200 rounded-full"
+                      >
+                        {cta.label}
+                        <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                      </Link>
+                    </div>
                   ) : (
                     <Link
                       key={ci}

@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import MarqueeStrip from '@/components/MarqueeStrip'
 import TrustBar from '@/components/TrustBar'
 import Services from '@/components/Services'
 import Testimonials from '@/components/Testimonials'
@@ -14,6 +15,7 @@ export default function Home() {
     <main>
       <Navbar />
       <Hero />
+      <MarqueeStrip />
       <TrustBar />
       <Services />
       <Testimonials />

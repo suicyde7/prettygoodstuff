@@ -79,3 +79,43 @@ body { top: 0 !important; }
   animation: shimmerSlide 3s ease-in-out infinite;
   pointer-events: none;
 }
+
+/* ── Hero blob float ── */
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(16px, -14px) scale(1.04); }
+  66%       { transform: translate(-10px, 9px) scale(0.97); }
+}
+@keyframes blobFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(-22px, -14px) scale(1.06); }
+}
+
+/* ── Animated gradient border (CTA) ── */
+@keyframes borderSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.gradient-border {
+  position: relative;
+  isolation: isolate;
+  border-radius: 9999px;
+  padding: 2px;
+  display: inline-flex;
+  overflow: hidden;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #CC785C 0%, #F5E8E2 25%, #B5614A 50%, #F5E8E2 75%, #CC785C 100%);
+  animation: borderSpin 4s linear infinite;
+  z-index: -1;
+}
+
+/* ── Marquee ticker ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}

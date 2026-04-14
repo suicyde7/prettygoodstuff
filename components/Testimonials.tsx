@@ -81,6 +81,17 @@ export default function Testimonials() {
               <div
                 key={service}
                 className={`bg-surface border ${s.border} rounded-lg p-8 flex flex-col gap-5`}
+                onMouseMove={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect()
+                  const x = (e.clientY - r.top) / r.height - 0.5
+                  const y = (e.clientX - r.left) / r.width - 0.5
+                  e.currentTarget.style.transform = `perspective(700px) rotateX(${-x * 8}deg) rotateY(${y * 8}deg) translateZ(8px)`
+                  e.currentTarget.style.transition = 'transform 0.1s ease-out'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) translateZ(0px)'
+                  e.currentTarget.style.transition = 'transform 0.6s ease-out'
+                }}
               >
                 {/* Result pill */}
                 <span className={`self-start text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full border ${s.result}`}>
