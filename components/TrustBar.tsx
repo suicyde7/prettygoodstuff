@@ -2,7 +2,7 @@ const stats = [
   { value: '63%', label: 'of product searches start on Amazon' },
   { value: '34%', label: 'average seller ACOS — target is under 15%' },
   { value: '$1.50+', label: 'average US prep center cost per unit' },
-  { value: '50%+', label: 'of FBA revenue consumed by fees' },
+  { value: '30%+', label: 'of FBA revenue goes to Amazon fees & ads' },
 ]
 
 export default function TrustBar() {

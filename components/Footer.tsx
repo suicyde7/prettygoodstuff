@@ -3,10 +3,11 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 const navLinks = [
-  { num: '01', label: 'Services', href: '#services' },
-  { num: '02', label: 'Platform', href: '#platform' },
-  { num: '03', label: 'Pricing', href: '#pricing' },
-  { num: '04', label: 'Contact', href: '#contact' },
+  { num: '01', label: 'Services',  href: '#services' },
+  { num: '02', label: 'Pricing',   href: '#pricing' },
+  { num: '03', label: 'Platform',  href: '#platform' },
+  { num: '04', label: 'FAQ',       href: '#faq' },
+  { num: '05', label: 'Contact',   href: '#contact' },
 ]
 
 // Split to prevent scraper harvest

@@ -81,7 +81,7 @@ export default function Platform() {
             </h2>
           </div>
           <p className="hidden md:block text-muted text-sm max-w-xs text-right leading-relaxed">
-            Two products in development. Built on the same expertise behind Helm — now available as software.
+            Two products in development. Built on the same systems we run for our managed clients — now available as self-serve software.
           </p>
         </div>
 

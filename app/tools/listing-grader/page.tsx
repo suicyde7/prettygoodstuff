@@ -243,14 +243,24 @@ export default function ListingGraderPage() {
     const r = scoreInputs(inp)
     setResults(r)
     sendLead({
-      tool:       'Listing Grader',
-      name:       name.trim(),
-      email:      email.trim(),
-      score:      r.total,
-      grade:      r.grade,
-      gradeLabel: r.gradeLabel,
-      launchAge:  inp.launchAge,
-      topFix:     r.fixes[0]?.text ?? '',
+      tool:            'Listing Grader',
+      name:            name.trim(),
+      email:           email.trim(),
+      score:           r.total,
+      grade:           r.grade,
+      gradeLabel:      r.gradeLabel,
+      titleLength:     r.titleLen,
+      bulletCount:     r.bulletArr.length,
+      imageCount:      inp.imageCount,
+      hasVideo:        inp.hasVideo,
+      hasAPlus:        inp.hasAPlus,
+      hasBrandStore:   inp.hasBrandStore,
+      brandRegistry:   inp.brandRegistry,
+      backendKeywords: inp.backendKeywords,
+      launchAge:       inp.launchAge,
+      topFix:          r.fixes[0]?.text ?? '',
+      fix2:            r.fixes[1]?.text ?? '',
+      fix3:            r.fixes[2]?.text ?? '',
     })
   }
 

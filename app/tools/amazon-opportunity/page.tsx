@@ -250,12 +250,19 @@ export default function AmazonOpportunityPage() {
       keyword3:         inp.keyword3 || '',
       category:         CATEGORIES[inp.category]?.label ?? inp.category,
       pricePoint:       parseFloat(inp.pricePoint) || 0,
+      hasSupplier:      inp.supplier,
+      differentiated:   inp.differentiated,
+      hasTrademark:     inp.trademark,
+      hasPhotos:        inp.photos,
       hasWebsite:       inp.hasWebsite,
       websiteUrl:       inp.websiteUrl || '',
       launchTimeline:   inp.launchTimeline,
       opportunityScore: r.opportunityScore,
       readinessScore:   r.readinessScore,
       verdict:          r.verdict,
+      demandTier:       r.demandTier,
+      competition:      r.competitionLabel,
+      timeToLive:       r.timeToLive,
     })
   }
 

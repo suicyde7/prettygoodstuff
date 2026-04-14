@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter_Tight, Oswald } from 'next/font/google'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/next'
+import FloatingCTA from '@/components/FloatingCTA'
 import './globals.css'
 
 const interTight = Inter_Tight({
@@ -120,6 +122,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Hidden Google Translate mount point */}
         <div id="google_translate_element" className="hidden" />
         {children}
+        <FloatingCTA />
+        <Analytics />
 
         {/* Google Translate — init */}
         <Script id="gt-init" strategy="afterInteractive">{`
