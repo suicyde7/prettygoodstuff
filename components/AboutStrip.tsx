@@ -1,12 +1,13 @@
 'use client'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
+import CountUp from './CountUp'
 
 // ── UPDATE THESE before going live ──────────────────────────────────────────
 // Replace the stat values and body copy with your real numbers and story.
 const stats = [
-  { value: '5+',   label: 'Years Amazon Selling' },   // ← update
-  { value: '30+',  label: 'ASINs Managed' },           // ← update
-  { value: '$1M+', label: 'Ad Spend Managed' },        // ← update
+  { target: 5,  prefix: '',  suffix: '+',  decimals: 0, label: 'Years Amazon Selling' },  // ← update
+  { target: 30, prefix: '',  suffix: '+',  decimals: 0, label: 'ASINs Managed' },          // ← update
+  { target: 1,  prefix: '$', suffix: 'M+', decimals: 0, label: 'Ad Spend Managed' },       // ← update
 ]
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -47,9 +48,16 @@ export default function AboutStrip() {
 
           {/* Stat mini-bar */}
           <div className="grid grid-cols-3 gap-4 pt-2 border-t border-border mt-2">
-            {stats.map(({ value, label }) => (
+            {stats.map(({ target, prefix, suffix, decimals, label }) => (
               <div key={label} className="flex flex-col pt-4">
-                <span className="font-display font-bold text-3xl gradient-text-accent leading-none">{value}</span>
+                <CountUp
+                  target={target}
+                  prefix={prefix}
+                  suffix={suffix}
+                  decimals={decimals}
+                  duration={1600}
+                  className="font-display font-bold text-3xl gradient-text-accent leading-none"
+                />
                 <span className="text-muted text-[10px] tracking-widest uppercase mt-1.5 leading-snug">{label}</span>
               </div>
             ))}

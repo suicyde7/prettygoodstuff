@@ -138,6 +138,11 @@ export default function Services() {
                 className="relative cursor-pointer group"
                 style={{ perspective: '1200px' }}
                 onClick={() => toggle(i)}
+                onMouseMove={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect()
+                  e.currentTarget.style.setProperty('--sx', `${((e.clientX - r.left) / r.width) * 100}%`)
+                  e.currentTarget.style.setProperty('--sy', `${((e.clientY - r.top) / r.height) * 100}%`)
+                }}
               >
                 <div
                   className="relative w-full transition-all duration-700"
@@ -153,6 +158,11 @@ export default function Services() {
                     className={`absolute inset-0 flex flex-col p-8 bg-surface border border-border rounded-lg transition-all duration-300 group-hover:ring-2 ${s.ring} group-hover:shadow-xl group-hover:shadow-accent/10`}
                     style={{ backfaceVisibility: 'hidden' }}
                   >
+                    {/* Spotlight */}
+                    <div
+                      className="absolute inset-0 rounded-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: 'radial-gradient(circle at var(--sx,50%) var(--sy,50%), rgba(204,120,92,0.07), transparent 60%)' }}
+                    />
                     {/* Header */}
                     <div className="flex items-start justify-between mb-5">
                       <div className={`text-xl p-2.5 border rounded-md flex-shrink-0 ${s.icon}`}>{icon}</div>
@@ -208,6 +218,11 @@ export default function Services() {
                     className={`absolute inset-0 flex flex-col p-8 bg-surface border border-border rounded-lg transition-all duration-300 group-hover:ring-2 ${s.ring} group-hover:shadow-xl group-hover:shadow-accent/10`}
                     style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                   >
+                    {/* Spotlight */}
+                    <div
+                      className="absolute inset-0 rounded-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: 'radial-gradient(circle at var(--sx,50%) var(--sy,50%), rgba(204,120,92,0.07), transparent 60%)' }}
+                    />
                     <div className="flex items-start justify-between mb-6">
                       <div className={`text-xl p-2.5 border rounded-md ${s.icon}`}>{icon}</div>
                       <span className={`text-[10px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full border ${s.backTag}`}>
